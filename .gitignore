@@ -1,2 +1,4 @@
-# Ignore environment files
 application.properties
+application.yml
+application-*.properties
+application-*.yml
