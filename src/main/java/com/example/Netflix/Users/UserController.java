@@ -2,6 +2,7 @@ package com.example.Netflix.Users;
 
 import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.JWT.JwtTokenFactory;
+import com.example.Netflix.Warnings.Warning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,15 @@ public class UserController {
         String email = userRequestBody.getEmail();
         User user = new User();
         String token = userService.generateToken();
+        Warning warning = new Warning();
 
         if (userService.findUserByEmail(email).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Email is taken"));
         }
 
         user.setEmail(email);
+        user.setWarning(warning);
+        warning.setUser(user);
         user.setPassword(userRequestBody.getPassword());
         userService.saveUser(user);
 //        userService.sendEmail(user, token);
@@ -74,9 +78,9 @@ public class UserController {
 
                     return ResponseEntity.ok(user);
                 } catch (BadCredentialsException e) {
-                    user.setLoginAttempt(user.getLoginAttempt() + 1);
+                    user.getWarning().setLoginFaults(user.getWarning().getLoginFaults() + 1);
 
-                    if (user.getLoginAttempt() >= 3) {
+                    if (user.getWarning().getLoginFaults() >= 3) {
                         userService.banUser(user);
                     }
 

@@ -1,12 +1,15 @@
 package com.example.Netflix.Profiles;
 
+import com.example.Netflix.Content.Content;
 import com.example.Netflix.Preferences.Preferences;
 import com.example.Netflix.Users.User;
+import com.example.Netflix.WatchHistories.WatchHistory;
 import com.example.Netflix.enums.Language;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +28,10 @@ public class Profile {
     private Language language;
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private Preferences preferences;
+    @OneToMany
+    private List<WatchHistory> watchHistories;
+    @OneToMany
+    private List<Content> watchList;
 
     public Profile() {
 
@@ -97,5 +104,21 @@ public class Profile {
 
     public void setPreferences(Preferences preferences) {
         this.preferences = preferences;
+    }
+
+    public List<WatchHistory> getWatchHistories() {
+        return this.watchHistories;
+    }
+
+    public void setWatchHistories(List<WatchHistory> watchHistories) {
+        this.watchHistories = watchHistories;
+    }
+
+    public List<Content> getWatchList() {
+        return this.watchList;
+    }
+
+    public void setWatchList(List<Content> watchList) {
+        this.watchList = watchList;
     }
 }
