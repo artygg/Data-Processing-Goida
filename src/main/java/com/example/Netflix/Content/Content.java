@@ -1,7 +1,9 @@
 package com.example.Netflix.Content;
 
+import com.example.Netflix.Content.Genre.Genre;
 import com.example.Netflix.Content.GenreBridge.GenreBridge;
 import com.example.Netflix.Content.Movie.Movie;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -31,7 +33,8 @@ public class Content {
     private Set<Movie> movies;
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<GenreBridge> genres;
+    @JsonManagedReference
+    private Set<Genre> genres;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -60,8 +63,8 @@ public class Content {
     public Set<Movie> getMovies() { return movies; }
     public void setMovies(Set<Movie> movies) { this.movies = movies; }
 
-    public Set<GenreBridge> getGenres() { return genres; }
-    public void setGenres(Set<GenreBridge> genres) { this.genres = genres; }
+    public Set<Genre> getGenres() { return genres; }
+    public void setGenres(Set<Genre> genres) { this.genres = genres; }
 
 }
 
