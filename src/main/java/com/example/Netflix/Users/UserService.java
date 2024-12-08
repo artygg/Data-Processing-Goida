@@ -1,8 +1,8 @@
 package com.example.Netflix.Users;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+//import org.springframework.mail.SimpleMailMessage;
+//import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JavaMailSender javaMailSender;
+//    @Autowired
+//    private JavaMailSender javaMailSender;
 
     public void saveUser(User user) {
         String password = user.getPassword();
@@ -55,11 +55,11 @@ public class UserService {
         String verificationUrl = "http://localhost:3000/verification?token=" + token;
         String message = "Please verify your email by clicking that link: " + verificationUrl;
 
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(user.getEmail());
-        mailMessage.setSubject(subject);
-        mailMessage.setText(message);
-        javaMailSender.send(mailMessage);
+//        SimpleMailMessage mailMessage = new SimpleMailMessage();
+//        mailMessage.setTo(user.getEmail());
+//        mailMessage.setSubject(subject);
+//        mailMessage.setText(message);
+//        javaMailSender.send(mailMessage);
     }
 
     public Optional<User> findUserByToken(String token) {
