@@ -4,6 +4,7 @@ import com.example.Netflix.Content.Genre.Genre;
 import com.example.Netflix.Content.Genre.GenreRepository;
 import com.example.Netflix.Content.GenreBridge.GenreBridge;
 import com.example.Netflix.Content.GenreBridge.GenreBridgeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,23 +40,27 @@ public class ContentService
         contentRepository.deleteById(id);
     }
 
-    public void assignGenresToContent(Integer contentId, List<Long> genreIds) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found"));
+    public void assignGenresToContent(Long contentId, List<Long> genreIds) {
+        Content content = contentRepository.findContentById(contentId)
+                .orElseThrow(() -> new RuntimeException("Content not found with ID: " + contentId));
 
         List<Genre> genres = genreRepository.findAllById(genreIds);
 
-        if (genres.isEmpty()) {
-            throw new RuntimeException("No genres found for the given IDs");
+        if (genres.size() != genreIds.size()) {
+            throw new RuntimeException("Some genres were not found for the given IDs");
         }
 
         for (Genre genre : genres) {
-            GenreBridge genreBridge = new GenreBridge();
-            genreBridge.setContent(content);
-            genreBridge.setGenre(genre);
-
-            genreBridgeRepository.save(genreBridge);
+            GenreBridge genreBridge = new GenreBridge(content, genre);
+            try {
+                genreBridgeRepository.save(genreBridge);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
+
 
 }

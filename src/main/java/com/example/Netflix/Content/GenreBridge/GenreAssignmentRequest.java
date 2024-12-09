@@ -3,14 +3,14 @@ package com.example.Netflix.Content.GenreBridge;
 import java.util.List;
 
 public class GenreAssignmentRequest {
-    private Integer contentId;
+    private Long contentId;
     private List<Long> genreIds;
 
-    public Integer getContentId() {
+    public Long getContentId() {
         return contentId;
     }
 
-    public void setContentId(Integer contentId) {
+    public void setContentId(Long contentId) {
         this.contentId = contentId;
     }
 

@@ -2,31 +2,64 @@ package com.example.Netflix.Content.GenreBridge;
 
 import com.example.Netflix.Content.Content;
 import com.example.Netflix.Content.Genre.Genre;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "genre_bridges")
 public class GenreBridge {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @EmbeddedId
+    private GenreBridgeKey id;
+
+    @JsonIgnore
+    @JsonBackReference
     @ManyToOne
+    @MapsId("contentId")
     @JoinColumn(name = "content_id", nullable = false)
     private Content content;
 
+    @JsonBackReference
     @ManyToOne
+    @MapsId("genreId")
     @JoinColumn(name = "genre_id", nullable = false)
     private Genre genre;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public GenreBridge() {}
 
-    public Content getContent() { return content; }
-    public void setContent(Content content) { this.content = content; }
+    public GenreBridge(Content content, Genre genre) {
+        this.content = content;
+        this.genre = genre;
+        this.id = new GenreBridgeKey(content.getId(), genre.getId());
+    }
 
-    public Genre getGenre() { return genre; }
-    public void setGenre(Genre genre) { this.genre = genre; }
+    // Getters and Setters
+    public GenreBridgeKey getId() {
+        return id;
+    }
 
+    public void setId(GenreBridgeKey id) {
+        this.id = id;
+    }
+
+    public Content getContent() {
+        return content;
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
+    }
 
 }
+
+

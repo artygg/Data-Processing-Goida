@@ -4,9 +4,12 @@ import com.example.Netflix.Content.Genre.Genre;
 import com.example.Netflix.Content.GenreBridge.GenreBridge;
 import com.example.Netflix.Content.Movie.Movie;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "contents")
@@ -34,7 +37,7 @@ public class Content {
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<Genre> genres;
+    private Set<GenreBridge> genres;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -63,8 +66,14 @@ public class Content {
     public Set<Movie> getMovies() { return movies; }
     public void setMovies(Set<Movie> movies) { this.movies = movies; }
 
-    public Set<Genre> getGenres() { return genres; }
-    public void setGenres(Set<Genre> genres) { this.genres = genres; }
+    public Set<GenreBridge> getGenres() { return genres; }
+    public void setGenres(Set<GenreBridge> genres) { this.genres = genres; }
 
+    @JsonProperty("genres")
+    public List<Long> getGenreIds() {
+        return genres.stream()
+                .map(genreBridge -> genreBridge.getGenre().getId())
+                .collect(Collectors.toList());
+    }
 }
 

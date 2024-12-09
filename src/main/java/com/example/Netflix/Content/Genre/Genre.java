@@ -3,6 +3,7 @@ package com.example.Netflix.Content.Genre;
 import com.example.Netflix.Content.Content;
 import com.example.Netflix.Content.GenreBridge.GenreBridge;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.Set;
 
@@ -15,11 +16,10 @@ public class Genre {
 
     private String name;
 
-//name    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<GenreBridge> genreBridges;
-    @ManyToOne
-    @JsonBackReference
-    private Content content;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GenreBridge> genreBridges;
+
 
 
     // Getters and Setters
