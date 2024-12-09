@@ -31,10 +31,7 @@ public class ProfileController {
     private UserService userService;
 
     @PostMapping()
-    public ResponseEntity<?> createProfile(@RequestParam() String username,
-                                           @RequestParam() String imageUrl,
-                                           @RequestParam(required = false) String age,
-                                           @RequestParam(required = false) String language) throws ProfileLimitReached {
+    public ResponseEntity<?> createProfile(@RequestBody ProfileDTO profileBody) throws ProfileLimitReached {
         String email;
 
         try {
@@ -49,14 +46,13 @@ public class ProfileController {
             User user = optionalUser.get();
 
             if (user.getProfiles().size() + 1 <= 4) {
-                System.out.println("Size: " + user.getProfiles().size());
                 Profile profile = new Profile();
 
-                profile.setProfileName(username);
-                profile.setProfilePhoto(imageUrl);
+                profile.setProfileName(profileBody.getProfileName());
+                profile.setProfilePhoto(profileBody.getProfilePhoto());
                 profile.setUser(user);
-                profile.setAge(age != null ? LocalDate.parse(age) : null);
-                profile.setLanguage(language != null ? Language.valueOf(language.toUpperCase()) : Language.ENGLISH);
+                profile.setAge(profileBody.getAge() != null ? LocalDate.parse(profileBody.getAge()) : null);
+                profile.setLanguage(profileBody.getLanguage() != null ? Language.valueOf(profileBody.getLanguage().toUpperCase()) : Language.ENGLISH);
 
                 user.addProfile(profile);
                 userService.updateUser(user);
@@ -98,10 +94,7 @@ public class ProfileController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable UUID id,
-                                           @RequestParam(required = false) String username,
-                                           @RequestParam(required = false) String imageUrl,
-                                           @RequestParam(required = false) String age,
-                                           @RequestParam(required = false) String language) {
+                                           @RequestBody ProfileDTO profileBody) {
         try {
             ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         } catch (ClassCastException e) {
@@ -113,17 +106,17 @@ public class ProfileController {
         if (optionalProfile.isPresent()) {
             Profile profile = optionalProfile.get();
 
-            profile.setProfileName(username == null || username.isEmpty() ? profile.getProfileName() : username);
-            profile.setProfilePhoto(imageUrl == null || imageUrl.isEmpty() ? profile.getProfilePhoto() : imageUrl);
+            profile.setProfileName(profileBody.getProfileName() == null || profileBody.getProfileName().isEmpty() ? profile.getProfileName() : profileBody.getProfileName());
+            profile.setProfilePhoto(profileBody.getProfilePhoto() == null || profileBody.getProfilePhoto().isEmpty() ? profile.getProfilePhoto() : profileBody.getProfilePhoto());
 
             try {
-                profile.setAge(age == null ? profile.getAge() : LocalDate.parse(age));
+                profile.setAge(profileBody.getAge() == null ? profile.getAge() : LocalDate.parse(profileBody.getAge()));
             } catch (DateTimeParseException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Invalid age format"));
             }
 
             try {
-                profile.setLanguage(language == null ? profile.getLanguage() : Language.valueOf(language.toUpperCase()));
+                profile.setLanguage(profileBody.getLanguage() == null ? profile.getLanguage() : Language.valueOf(profileBody.getLanguage().toUpperCase()));
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Invalid language value"));
             }
@@ -173,6 +166,7 @@ public class ProfileController {
             preferences.setInterestedInFilms(preferencesRequest.isInterestedInFilms());
             preferences.setInterestedInSeries(preferencesRequest.isInterestedInSeries());
             preferences.setInterestedInFilmsWithMinimumAge(preferencesRequest.isInterestedInFilmsWithMinimumAge());
+            preferences.setProfile(profile);
 
             profile.setPreferences(preferences);
             profileService.saveProfile(profile);

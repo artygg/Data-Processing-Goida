@@ -2,6 +2,8 @@ package com.example.Netflix.Users;
 
 import com.example.Netflix.Exceptions.ProfileLimitReached;
 import com.example.Netflix.Profiles.Profile;
+import com.example.Netflix.Warnings.Warning;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -19,12 +21,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Profile> profiles;
-    @ElementCollection
-    private Map<String, Integer> amountOfViewedFilms;
-    private int loginAttempt;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Warning warning;
     private boolean isBanned;
     private String token;
-    private LocalDateTime banUntil;
 
     public User() {
 
@@ -32,17 +33,13 @@ public class User {
 
     public User(String email,
                 String password,
-                int loginAttempt,
-                String token,
-                LocalDateTime banUntil) {
+                String token
+                ) {
         this.email = email;
         this.password = password;
-        this.loginAttempt = loginAttempt;
         this.isBanned = false;
         this.profiles = new ArrayList<>();
-        this.amountOfViewedFilms = new HashMap<>();
         this.token = token;
-        this.banUntil = banUntil;
     }
 
     public UUID getId() {
@@ -77,22 +74,6 @@ public class User {
         this.profiles = profiles;
     }
 
-    public Map<String, Integer> getAmountOfViewedFilms() {
-        return this.amountOfViewedFilms;
-    }
-
-    public void setAmountOfViewedFilms(HashMap<String, Integer> amountOfViewedFilms) {
-        this.amountOfViewedFilms = amountOfViewedFilms;
-    }
-
-    public int getLoginAttempt() {
-        return this.loginAttempt;
-    }
-
-    public void setLoginAttempt(int loginAttempt) {
-        this.loginAttempt = loginAttempt;
-    }
-
     public boolean isBanned() {
         return this.isBanned;
     }
@@ -117,15 +98,11 @@ public class User {
         this.token = token;
     }
 
-    public void setAmountOfViewedFilms(Map<String, Integer> amountOfViewedFilms) {
-        this.amountOfViewedFilms = amountOfViewedFilms;
+    public Warning getWarning() {
+        return this.warning;
     }
 
-    public LocalDateTime getBanUntil() {
-        return this.banUntil;
-    }
-
-    public void setBanUntil(LocalDateTime banUntil) {
-        this.banUntil = banUntil;
+    public void setWarning(Warning warning) {
+        this.warning = warning;
     }
 }

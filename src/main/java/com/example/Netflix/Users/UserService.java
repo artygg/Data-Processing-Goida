@@ -38,7 +38,7 @@ public class UserService {
 
     public void banUser(User user) {
         user.setBanned(true);
-        user.setBanUntil(LocalDateTime.now().plusMinutes(1));
+        user.getWarning().setBanEndDate(LocalDateTime.now().plusMinutes(1));;
         userRepository.save(user);
     }
 
@@ -66,16 +66,16 @@ public class UserService {
         return userRepository.findUserByToken(token);
     }
 
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(fixedRate = 60000)
     public void unbanUser() {
         System.out.println("Checking unban");
-        List<User> bannedUsers = userRepository.findAll().stream().filter(user -> user.isBanned() && user.getBanUntil() != null).toList();
+        List<User> bannedUsers = userRepository.findAll().stream().filter(user -> user.isBanned() && user.getWarning().getBanEndDate() != null).toList();
 
         for (User user : bannedUsers) {
-            if (LocalDateTime.now().isAfter(user.getBanUntil())) {
+            if (LocalDateTime.now().isAfter(user.getWarning().getBanEndDate())) {
                 user.setBanned(false);
-                user.setBanUntil(null);
-                user.setLoginAttempt(0);
+                user.getWarning().setBanEndDate(null);
+                user.getWarning().setLoginFaults(0);
                 userRepository.save(user);
             }
         }
