@@ -1,7 +1,6 @@
 package com.example.Netflix.Content;
 
 import com.example.Netflix.Content.Genre.Genre;
-import com.example.Netflix.Content.GenreBridge.GenreBridge;
 import com.example.Netflix.Content.Movie.Movie;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,9 +34,13 @@ public class Content {
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Movie> movies;
 
-    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private Set<GenreBridge> genres;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "genre_contents",
+            joinColumns = @JoinColumn(name = "genre_id"),
+            inverseJoinColumns = @JoinColumn(name = "content_id"))
+    private Set<Genre> genres;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -66,14 +69,14 @@ public class Content {
     public Set<Movie> getMovies() { return movies; }
     public void setMovies(Set<Movie> movies) { this.movies = movies; }
 
-    public Set<GenreBridge> getGenres() { return genres; }
-    public void setGenres(Set<GenreBridge> genres) { this.genres = genres; }
+    public Set<Genre> getGenres()
+    {
+        return genres;
+    }
 
-    @JsonProperty("genres")
-    public List<Long> getGenreIds() {
-        return genres.stream()
-                .map(genreBridge -> genreBridge.getGenre().getId())
-                .collect(Collectors.toList());
+    public void setGenres(Set<Genre> genres)
+    {
+        this.genres = genres;
     }
 }
 
