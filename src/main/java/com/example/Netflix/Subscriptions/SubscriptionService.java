@@ -17,7 +17,6 @@ public class SubscriptionService {
     @Autowired
     private ProfileRepository profileRepository;
 
-    // Free trial
     public Subscription startTrial(UUID profileId) {
         Optional<Profile> profileOpt = profileRepository.findById(profileId);
         if (profileOpt.isEmpty()) {
@@ -26,13 +25,12 @@ public class SubscriptionService {
 
         Profile profile = profileOpt.get();
         LocalDate startDate = LocalDate.now();
-        LocalDate endDate = startDate.plusDays(7); // Trial lasts 7 days
+        LocalDate endDate = startDate.plusDays(7);
 
         Subscription trialSubscription = new Subscription(profile, null, startDate, endDate);
         return subscriptionRepository.save(trialSubscription);
     }
 
-    // Creation of a paid subscription
     public Subscription createSubscription(UUID profileId, Integer priceId, LocalDate startDate, LocalDate endDate) {
         Optional<Profile> profileOpt = profileRepository.findById(profileId);
         if (profileOpt.isEmpty()) {
@@ -42,23 +40,20 @@ public class SubscriptionService {
         Profile profile = profileOpt.get();
         double subscriptionCost = getSubscriptionCost(priceId);
 
-        Subscription subscription = new Subscription(profile, priceId, startDate, endDate);
+        Subscription subscription = new Subscription(profile, (int) subscriptionCost, startDate, endDate);
         return subscriptionRepository.save(subscription);
     }
 
-    // Get subscription by ID
     public Optional<Subscription> getSubscriptionById(UUID id) {
         return subscriptionRepository.findById(id);
     }
 
-    // Handle invitation and discounts
     public void applyDiscountForInvitation(UUID inviterProfileId, UUID inviteeProfileId) {
         Profile inviter = profileRepository.findById(inviterProfileId)
                 .orElseThrow(() -> new IllegalArgumentException("Inviter profile not found"));
         Profile invitee = profileRepository.findById(inviteeProfileId)
                 .orElseThrow(() -> new IllegalArgumentException("Invitee profile not found"));
 
-        // Fetch the latest subscription for each profile
         Optional<Subscription> inviterSubscriptionOpt = subscriptionRepository.findLatestSubscriptionByProfileId(inviter.getId());
         Optional<Subscription> inviteeSubscriptionOpt = subscriptionRepository.findLatestSubscriptionByProfileId(invitee.getId());
 
@@ -70,7 +65,7 @@ public class SubscriptionService {
         Subscription inviteeSubscription = inviteeSubscriptionOpt.get();
 
         if (isEligibleForDiscount(inviterSubscription) && isEligibleForDiscount(inviteeSubscription)) {
-            inviterSubscription.setPriceId(inviterSubscription.getPriceId() - 2); // Apply €2 discount
+            inviterSubscription.setPriceId(inviterSubscription.getPriceId() - 2);
             inviteeSubscription.setPriceId(inviteeSubscription.getPriceId() - 2);
             subscriptionRepository.save(inviterSubscription);
             subscriptionRepository.save(inviteeSubscription);
@@ -79,9 +74,9 @@ public class SubscriptionService {
 
     private double getSubscriptionCost(Integer priceId) {
         return switch (priceId) {
-            case 1 -> 7.99; // SD
-            case 2 -> 10.99; // HD
-            case 3 -> 13.99; // UHD
+            case 1 -> 7.99;
+            case 2 -> 10.99;
+            case 3 -> 13.99;
             default -> throw new IllegalArgumentException("Invalid price ID");
         };
     }
