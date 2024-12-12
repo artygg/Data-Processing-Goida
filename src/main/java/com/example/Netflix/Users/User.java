@@ -2,6 +2,7 @@ package com.example.Netflix.Users;
 
 import com.example.Netflix.Exceptions.ProfileLimitReached;
 import com.example.Netflix.Profiles.Profile;
+import com.example.Netflix.Subscriptions.Subscription;
 import com.example.Netflix.Warnings.Warning;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -26,6 +27,7 @@ public class User {
     private Warning warning;
     private boolean isBanned;
     private String token;
+
 
     public User() {
 

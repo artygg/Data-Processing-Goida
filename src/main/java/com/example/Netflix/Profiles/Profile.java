@@ -2,6 +2,7 @@ package com.example.Netflix.Profiles;
 
 import com.example.Netflix.Content.Content;
 import com.example.Netflix.Preferences.Preferences;
+import com.example.Netflix.Subscriptions.Subscription;
 import com.example.Netflix.Users.User;
 import com.example.Netflix.WatchHistories.WatchHistory;
 import com.example.Netflix.enums.Language;
@@ -121,4 +122,6 @@ public class Profile {
     public void setWatchList(List<Content> watchList) {
         this.watchList = watchList;
     }
+
+
 }
