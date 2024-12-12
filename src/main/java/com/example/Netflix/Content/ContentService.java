@@ -2,8 +2,6 @@ package com.example.Netflix.Content;
 
 import com.example.Netflix.Content.Genre.Genre;
 import com.example.Netflix.Content.Genre.GenreRepository;
-import com.example.Netflix.Content.GenreBridge.GenreBridge;
-import com.example.Netflix.Content.GenreBridge.GenreBridgeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +13,11 @@ public class ContentService
 {
     private final ContentRepository contentRepository;
     private final GenreRepository genreRepository;
-    private final GenreBridgeRepository genreBridgeRepository;
 
     @Autowired
-    public ContentService(ContentRepository contentRepository, GenreRepository genreRepository,  GenreBridgeRepository genreBridgeRepository) {
+    public ContentService(ContentRepository contentRepository, GenreRepository genreRepository) {
         this.contentRepository = contentRepository;
         this.genreRepository = genreRepository;
-        this.genreBridgeRepository = genreBridgeRepository;
     }
 
 
@@ -40,27 +36,27 @@ public class ContentService
         contentRepository.deleteById(id);
     }
 
-    public void assignGenresToContent(Long contentId, List<Long> genreIds) {
-        Content content = contentRepository.findContentById(contentId)
-                .orElseThrow(() -> new RuntimeException("Content not found with ID: " + contentId));
-
-        List<Genre> genres = genreRepository.findAllById(genreIds);
-
-        if (genres.size() != genreIds.size()) {
-            throw new RuntimeException("Some genres were not found for the given IDs");
-        }
-
-        for (Genre genre : genres) {
-            GenreBridge genreBridge = new GenreBridge(content, genre);
-            try {
-                genreBridgeRepository.save(genreBridge);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void assignGenresToContent(Long contentId, List<Long> genreIds) {
+//        Content content = contentRepository.findContentById(contentId)
+//                .orElseThrow(() -> new RuntimeException("Content not found with ID: " + contentId));
+//
+//        List<Genre> genres = genreRepository.findAllById(genreIds);
+//
+//        if (genres.size() != genreIds.size()) {
+//            throw new RuntimeException("Some genres were not found for the given IDs");
+//        }
+//
+//        for (Genre genre : genres) {
+//            GenreBridge genreBridge = new GenreBridge(content, genre);
+//            try {
+//                genreBridgeRepository.save(genreBridge);
+//            }
+//            catch (Exception e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
 }

@@ -1,6 +1,5 @@
 package com.example.Netflix.Content;
 
-import com.example.Netflix.Content.GenreBridge.GenreAssignmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,13 +42,13 @@ public class ContentController
         }
     }
 
-    @PostMapping("/assign-genres")
-    public ResponseEntity<String> assignGenres(@RequestBody GenreAssignmentRequest request) {
-        try {
-            contentService.assignGenresToContent(request.getContentId(), request.getGenreIds());
-            return ResponseEntity.ok("Genres assigned successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    @PostMapping("/assign-genres")
+//    public ResponseEntity<String> assignGenres(@RequestBody GenreAssignmentRequest request) {
+//        try {
+//            contentService.assignGenresToContent(request.getContentId(), request.getGenreIds());
+//            return ResponseEntity.ok("Genres assigned successfully.");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 }
