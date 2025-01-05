@@ -1,4 +1,4 @@
-package com.example.Netflix.Content.Genre;
+package com.example.Netflix.Genre;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

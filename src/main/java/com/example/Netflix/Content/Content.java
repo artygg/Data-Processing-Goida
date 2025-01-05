@@ -1,14 +1,11 @@
 package com.example.Netflix.Content;
 
-import com.example.Netflix.Content.Genre.Genre;
-import com.example.Netflix.Content.Movie.Movie;
+import com.example.Netflix.Genre.Genre;
+import com.example.Netflix.Movie.Movie;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "contents")

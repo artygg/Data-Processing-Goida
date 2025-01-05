@@ -1,6 +1,5 @@
-package com.example.Netflix.Content.Genre;
+package com.example.Netflix.Genre;
 
-import com.example.Netflix.Content.Content;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

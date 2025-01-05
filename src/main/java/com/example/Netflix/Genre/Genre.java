@@ -1,4 +1,4 @@
-package com.example.Netflix.Content.Genre;
+package com.example.Netflix.Genre;
 
 import com.example.Netflix.Content.Content;
 import com.fasterxml.jackson.annotation.JsonBackReference;

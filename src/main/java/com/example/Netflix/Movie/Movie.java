@@ -1,7 +1,7 @@
-package com.example.Netflix.Content.Movie;
+package com.example.Netflix.Movie;
 
 import com.example.Netflix.Content.Content;
-import com.example.Netflix.Content.Subtitle.Subtitle;
+import com.example.Netflix.Subtitle.Subtitle;
 import jakarta.persistence.*;
 import java.util.Set;
 

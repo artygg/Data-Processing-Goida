@@ -1,8 +1,6 @@
 package com.example.Netflix.Content;
 
-import com.example.Netflix.Content.Genre.Genre;
-import com.example.Netflix.Content.Genre.GenreRepository;
-import jakarta.transaction.Transactional;
+import com.example.Netflix.Genre.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
