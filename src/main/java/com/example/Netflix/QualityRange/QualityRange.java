@@ -1,25 +1,25 @@
-package com.example.Netflix.Subtitle;
+package com.example.Netflix.QualityRange;
 
 import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
 
 @Entity
-@IdClass(SubtitleId.class)
-@Table(name = "subtitles")
-public class Subtitle {
+@IdClass(QualityRangeId.class)
+@Table(name = "quality_ranges")
+public class QualityRange {
     @Id
     private Long contentId;
 
     @Id
-    private String language;
+    private Long resolutionId;
 
-    private String subtitleFilePath;
+    private String resolutionName;
 
     @ManyToOne
     @JoinColumn(name = "content_id", insertable = false, updatable = false)
     private Content content;
 
-    public Subtitle()
+    public QualityRange()
     {
     }
 
@@ -33,24 +33,24 @@ public class Subtitle {
         this.contentId = contentId;
     }
 
-    public String getLanguage()
+    public Long getResolutionId()
     {
-        return language;
+        return resolutionId;
     }
 
-    public void setLanguage(String language)
+    public void setResolutionId(Long resolutionId)
     {
-        this.language = language;
+        this.resolutionId = resolutionId;
     }
 
-    public String getSubtitleFilePath()
+    public String getResolutionName()
     {
-        return subtitleFilePath;
+        return resolutionName;
     }
 
-    public void setSubtitleFilePath(String subtitleFilePath)
+    public void setResolutionName(String resolutionName)
     {
-        this.subtitleFilePath = subtitleFilePath;
+        this.resolutionName = resolutionName;
     }
 
     public Content getContent()
