@@ -11,7 +11,6 @@ public class WatchHistory {
     @OneToOne
     private Content content;
     private String stoppedAt;
-    private int progress;
     private int watchingTimes;
 
     public WatchHistory() {
@@ -24,7 +23,6 @@ public class WatchHistory {
                         int watchingTimes) {
         this.content = content;
         this.stoppedAt = stoppedAt;
-        this.progress = progress;
         this.watchingTimes = watchingTimes;
     }
 
@@ -50,14 +48,6 @@ public class WatchHistory {
 
     public void setStoppedAt(String stoppedAt) {
         this.stoppedAt = stoppedAt;
-    }
-
-    public int getProgress() {
-        return this.progress;
-    }
-
-    public void setProgress(int progress) {
-        this.progress = progress;
     }
 
     public int getWatchingTimes() {
