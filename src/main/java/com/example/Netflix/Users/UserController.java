@@ -2,18 +2,13 @@ package com.example.Netflix.Users;
 
 import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.JWT.JwtTokenFactory;
+import com.example.Netflix.Referals.Referral;
+import com.example.Netflix.Referals.ReferralService;
 import com.example.Netflix.Warnings.Warning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
@@ -27,6 +22,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtTokenFactory jwtTokenFactory;
+    @Autowired
+    private ReferralService referralService;
 
     @PostMapping("/registration")
     public ResponseEntity<?> registration(@RequestBody UserRequestBody userRequestBody) {
@@ -66,52 +63,6 @@ public class UserController {
 
 //    Leave this for SystemUser, will be transferred there later
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody UserRequestBody userRequestBody) {
-//        Optional<User> optionalUser = userService.findUserByEmail(userRequestBody.getEmail());
-//        User user;
-//
-//        if (optionalUser.isPresent()) {
-//            user = optionalUser.get();
-//
-//            if (!userService.isBanned(user)) {
-//                try {
-//                    SecurityContext contextHolder = SecurityContextHolder.createEmptyContext();
-//
-//                    Authentication authentication = authenticationManager.authenticate(
-//                            new UsernamePasswordAuthenticationToken(
-//                                    userRequestBody.getEmail(),
-//                                    userRequestBody.getPassword()
-//                            )
-//                    );
-//                    contextHolder.setAuthentication(authentication);
-//                    SecurityContextHolder.setContext(contextHolder);
-//                    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//                    String jwt = jwtTokenFactory.generateToken(userDetails.getUsername());
-//
-//                    user.setToken(jwt);
-//                    userService.updateUser(user);
-//
-//                    return ResponseEntity.ok(user);
-//                } catch (BadCredentialsException e) {
-//                    user.getWarning().setLoginFaults(user.getWarning().getLoginFaults() + 1);
-//
-//                    if (user.getWarning().getLoginFaults() >= 3) {
-//                        userService.banUser(user);
-//                    }
-//
-//                    userService.updateUser(user);
-//
-//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Wrong credentials"));
-//                }
-//            } else {
-//                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMessage("User is banned"));
-//            }
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("User does not exist"));
-//    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUserCredentials(@PathVariable Long id,
                                                    @RequestBody UserRequestBody userRequestBody) {
@@ -139,5 +90,34 @@ public class UserController {
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested user was not found"));
+    }
+
+    @PostMapping("/invite/{id}")
+    public ResponseEntity<?> inviteUserWithReferralLink(@PathVariable Long id,
+                                                        @RequestBody User userBody) {
+        Optional<User> optionalHostUser = userService.findUserByUserId(userBody.getId());
+        Optional<User> optionalInvitedUser = userService.findUserByUserId(id);
+
+        if (optionalHostUser.isPresent()) {
+            User hostUser = optionalHostUser.get();
+
+            if (optionalInvitedUser.isPresent()) {
+                User invitedUser = optionalInvitedUser.get();
+                Referral referral = new Referral();
+
+                referral.setInvitedId(invitedUser.getId());
+                referral.setHostId(hostUser.getId());
+
+                referralService.saveReferral(referral);
+                hostUser.setHasUsedReferralLink(true);
+                userService.updateUser(hostUser);
+
+                return ResponseEntity.ok("Referral was successfully saved");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested user to invite was not found");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested host was not found");
+        }
     }
 }

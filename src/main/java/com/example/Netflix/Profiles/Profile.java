@@ -32,6 +32,7 @@ public class Profile {
     private List<WatchHistory> watchHistories;
     @OneToMany
     private List<Content> watchList;
+    private boolean isChild;
 
     public Profile() {
 
@@ -48,6 +49,7 @@ public class Profile {
         this.age = age;
         this.language = Language.ENGLISH;
         this.preferences = preferences;
+        this.isChild = false;
     }
 
     public UUID getId() {
@@ -88,6 +90,7 @@ public class Profile {
 
     public void setAge(LocalDate age) {
         this.age = age;
+        setChild(age.getYear() - LocalDate.now().getYear() >= 18);
     }
 
     public Language getLanguage() {
@@ -122,5 +125,11 @@ public class Profile {
         this.watchList = watchList;
     }
 
+    public boolean isChild() {
+        return this.isChild;
+    }
 
+    public void setChild(boolean child) {
+        isChild = child;
+    }
 }
