@@ -21,7 +21,8 @@ public class ContentService {
         return contentRepository.findAll();
     }
 
-    public Content getContentById(Long id) {
+    public Content getContentById(Long id) throws ResourceNotFoundException
+    {
         return contentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found with ID: " + id));
     }
@@ -34,7 +35,8 @@ public class ContentService {
         return contentRepository.save(content);
     }
 
-    public Content updateContent(Long id, Content updatedContent) {
+    public Content updateContent(Long id, Content updatedContent) throws ResourceNotFoundException
+    {
         Content existingContent = getContentById(id);
 
         existingContent.setTitle(updatedContent.getTitle());

@@ -26,7 +26,7 @@ public class ContentController
     }
 
     @GetMapping("/{id}")
-    public Content getContentById(@PathVariable Long id)
+    public Content getContentById(@PathVariable Long id) throws ResourceNotFoundException
     {
         return contentService.getContentById(id);
     }
@@ -44,7 +44,7 @@ public class ContentController
     }
 
     @PutMapping("/{id}")
-    public Content updateContent(@PathVariable Long id, @RequestBody Content updatedContent)
+    public Content updateContent(@PathVariable Long id, @RequestBody Content updatedContent) throws ResourceNotFoundException
     {
         return contentService.updateContent(id, updatedContent);
     }
