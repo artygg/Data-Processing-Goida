@@ -18,13 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    @Lazy
-    @Autowired
-    private AuthenticationManager authenticationManager;
     @Autowired
     private UserService userService;
     @Autowired
@@ -34,7 +32,6 @@ public class UserController {
     public ResponseEntity<?> registration(@RequestBody UserRequestBody userRequestBody) {
         String email = userRequestBody.getEmail();
         User user = new User();
-        String token = userService.generateToken();
         String jwt = jwtTokenFactory.generateToken(email);
         Warning warning = new Warning();
 
@@ -48,7 +45,6 @@ public class UserController {
         user.setPassword(userRequestBody.getPassword());
         user.setToken(jwt);
         userService.saveUser(user);
-//        userService.sendEmail(user, token);
 
         return ResponseEntity.ok(new ResponseMessage("User was registered successfully"));
     }
@@ -116,15 +112,24 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("User does not exist"));
 //    }
 
-    @PutMapping()
-    public ResponseEntity<?> updatePassword(@RequestBody UserRequestBody userRequestBody) {
-        Optional<User> optionalUser = userService.findUserByEmail(userRequestBody.getEmail());
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUserCredentials(@PathVariable Long id,
+                                                   @RequestBody UserRequestBody userRequestBody) {
+        Optional<User> optionalUser = userService.findUserByUserId(id);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
             if (!userService.isBanned(user)) {
-                user.setPassword(userRequestBody.getPassword());
+                user.setPassword(
+                        userRequestBody.getPassword() != null ?
+                                userRequestBody.getPassword() :
+                                user.getPassword());
+                user.setEmail(
+                        userRequestBody.getEmail() != null ?
+                                userRequestBody.getEmail() :
+                                user.getEmail()
+                );
                 userService.saveUser(user);
 
                 return ResponseEntity.ok(user);
@@ -135,21 +140,4 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested user was not found"));
     }
-
-//    @PutMapping("/verification")
-//    public ResponseEntity<?> verification(@RequestParam String token) {
-//        Optional<User> optionalUser = userService.findUserByToken(token);
-//
-//        if (optionalUser.isPresent()) {
-//            User user = optionalUser.get();
-//
-//            if (user.getToken().equalsIgnoreCase(token)) {
-//                return ResponseEntity.ok(new ResponseMessage("User has been verified"));
-//            } else {
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Token is invalid"));
-//            }
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("User does not exist"));
-//    }
 }

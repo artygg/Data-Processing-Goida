@@ -1,5 +1,6 @@
 package com.example.Netflix.WatchHistory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/watchHistory")
 public class WatchHistoryController {
+    @Autowired
     private final WatchHistoryService watchHistoryService;
 
     public WatchHistoryController(WatchHistoryService watchHistoryService) {

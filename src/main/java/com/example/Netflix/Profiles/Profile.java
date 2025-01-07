@@ -28,7 +28,7 @@ public class Profile {
     private Language language;
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private Preferences preferences;
-    @OneToMany
+    @OneToMany(mappedBy = "profileId")
     private List<WatchHistory> watchHistories;
     @OneToMany
     private List<Content> watchList;

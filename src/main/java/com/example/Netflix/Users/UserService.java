@@ -18,8 +18,6 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-//    @Autowired
-//    private JavaMailSender javaMailSender;
 
     public void saveUser(User user) {
         String password = user.getPassword();
@@ -36,6 +34,10 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
+    public Optional<User> findUserByUserId(Long id) {
+        return userRepository.findUserById(id);
+    }
+
     public void banUser(User user) {
         user.setBanned(true);
         user.getWarning().setBanEndDate(LocalDateTime.now().plusMinutes(1));;
@@ -48,22 +50,6 @@ public class UserService {
 
     public String generateToken() {
         return UUID.randomUUID().toString();
-    }
-
-    public void sendEmail(User user, String token) {
-        String subject = "Email verification";
-        String verificationUrl = "http://localhost:3000/verification?token=" + token;
-        String message = "Please verify your email by clicking that link: " + verificationUrl;
-
-//        SimpleMailMessage mailMessage = new SimpleMailMessage();
-//        mailMessage.setTo(user.getEmail());
-//        mailMessage.setSubject(subject);
-//        mailMessage.setText(message);
-//        javaMailSender.send(mailMessage);
-    }
-
-    public Optional<User> findUserByToken(String token) {
-        return userRepository.findUserByToken(token);
     }
 
     @Scheduled(fixedRate = 60000)
@@ -80,4 +66,6 @@ public class UserService {
             }
         }
     }
+
+
 }

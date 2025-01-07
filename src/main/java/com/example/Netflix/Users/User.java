@@ -16,7 +16,7 @@ import java.util.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
     private String email;
     private String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -25,6 +25,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Warning warning;
+    private boolean hasUsedReferralLink;
     private boolean isBanned;
     private String token;
 
@@ -35,20 +36,22 @@ public class User {
 
     public User(String email,
                 String password,
-                String token
+                String token,
+                boolean hasUsedReferralLink
                 ) {
         this.email = email;
         this.password = password;
         this.isBanned = false;
         this.profiles = new ArrayList<>();
         this.token = token;
+        this.hasUsedReferralLink = hasUsedReferralLink;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -106,5 +109,13 @@ public class User {
 
     public void setWarning(Warning warning) {
         this.warning = warning;
+    }
+
+    public boolean isHasUsedReferralLink() {
+        return this.hasUsedReferralLink;
+    }
+
+    public void setHasUsedReferralLink(boolean hasUsedReferralLink) {
+        this.hasUsedReferralLink = hasUsedReferralLink;
     }
 }
