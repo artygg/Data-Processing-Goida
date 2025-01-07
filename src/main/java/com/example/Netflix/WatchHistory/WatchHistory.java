@@ -1,4 +1,4 @@
-package com.example.Netflix.WatchHistories;
+package com.example.Netflix.WatchHistory;
 
 import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
