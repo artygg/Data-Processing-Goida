@@ -8,15 +8,18 @@ import jakarta.persistence.*;
 @Table(name = "subtitles")
 public class Subtitle {
     @Id
+    @Column(name = "content_id") // Explicit column mapping
     private Long contentId;
 
     @Id
+    @Column(name = "language") // Explicit column mapping
     private String language;
 
+    @Column(name = "subtitle_file_path")
     private String subtitleFilePath;
 
     @ManyToOne
-    @JoinColumn(name = "content_id", insertable = false, updatable = false)
+    @JoinColumn(name = "content_id", insertable = false, updatable = false) // Avoid column duplication
     private Content content;
 
     public Subtitle()
