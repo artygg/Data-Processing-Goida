@@ -10,14 +10,23 @@ public class WatchHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "profile_id") // Explicit mapping
     private Long profileId;
+
+    @Column(name = "content_id") // Explicit mapping
     private Long contentId;
+
+    @Column(name = "stopped_at") // Explicit mapping
     private Double stoppedAt;
+
+    @Column(name = "progress") // Explicit mapping
     private Double progress;
+
+    @Column(name = "watching_times") // Explicit mapping
     private Integer watchingTimes;
 
     @ManyToOne
-    @JoinColumn(name = "content_id", insertable = false, updatable = false)
+    @JoinColumn(name = "content_id", insertable = false, updatable = false) // Avoid duplicate mapping
     private Content content;
 
     public WatchHistory()
