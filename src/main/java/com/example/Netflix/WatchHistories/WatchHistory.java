@@ -4,57 +4,93 @@ import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "watch_histories")
 public class WatchHistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-    @OneToOne
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long profileId;
+    private Long contentId;
+    private Double stoppedAt;
+    private Double progress;
+    private Integer watchingTimes;
+
+    @ManyToOne
+    @JoinColumn(name = "content_id", insertable = false, updatable = false)
     private Content content;
-    private String stoppedAt;
-    private int watchingTimes;
 
-    public WatchHistory() {
-
+    public WatchHistory()
+    {
     }
 
-    public WatchHistory(Content content,
-                        String stoppedAt,
-                        int progress,
-                        int watchingTimes) {
-        this.content = content;
-        this.stoppedAt = stoppedAt;
-        this.watchingTimes = watchingTimes;
+    public Long getId()
+    {
+        return id;
     }
 
-    public Integer getId() {
-        return this.id;
-    }
-
-    public void setId(Integer id) {
+    public void setId(Long id)
+    {
         this.id = id;
     }
 
-    public Content getContent() {
-        return this.content;
+    public Long getProfileId()
+    {
+        return profileId;
     }
 
-    public void setContent(Content content) {
-        this.content = content;
+    public void setProfileId(Long profileId)
+    {
+        this.profileId = profileId;
     }
 
-    public String getStoppedAt() {
-        return this.stoppedAt;
+    public Long getContentId()
+    {
+        return contentId;
     }
 
-    public void setStoppedAt(String stoppedAt) {
+    public void setContentId(Long contentId)
+    {
+        this.contentId = contentId;
+    }
+
+    public Double getStoppedAt()
+    {
+        return stoppedAt;
+    }
+
+    public void setStoppedAt(Double stoppedAt)
+    {
         this.stoppedAt = stoppedAt;
     }
 
-    public int getWatchingTimes() {
-        return this.watchingTimes;
+    public Double getProgress()
+    {
+        return progress;
     }
 
-    public void setWatchingTimes(int watchingTimes) {
+    public void setProgress(Double progress)
+    {
+        this.progress = progress;
+    }
+
+    public Integer getWatchingTimes()
+    {
+        return watchingTimes;
+    }
+
+    public void setWatchingTimes(Integer watchingTimes)
+    {
         this.watchingTimes = watchingTimes;
+    }
+
+    public Content getContent()
+    {
+        return content;
+    }
+
+    public void setContent(Content content)
+    {
+        this.content = content;
     }
 }

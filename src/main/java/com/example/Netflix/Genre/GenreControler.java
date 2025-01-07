@@ -2,10 +2,9 @@ package com.example.Netflix.Genre;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/genre")
@@ -18,11 +17,14 @@ public class GenreControler
     {
         this.genreService = genreService;
     }
+    @GetMapping
+    public List<Genre> getAllGenres() {
+        return genreService.getAllGenres();
+    }
 
     @PostMapping
     public ResponseEntity<Genre> createGenre(@RequestBody Genre genre) {
         try {
-            System.out.println("Received POST request with content: " + genre);
             Genre savedGenre = genreService.saveGenre(genre);
             return ResponseEntity.ok(savedGenre);
         } catch (Exception e) {

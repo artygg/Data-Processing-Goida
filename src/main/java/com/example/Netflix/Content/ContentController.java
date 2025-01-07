@@ -10,37 +10,48 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/contents")
-public class ContentController {
+public class ContentController
+{
     private final ContentService contentService;
 
-    public ContentController(ContentService contentService) {
+    public ContentController(ContentService contentService)
+    {
         this.contentService = contentService;
     }
 
     @GetMapping
-    public List<Content> getAllContents() {
+    public List<Content> getAllContents()
+    {
         return contentService.getAllContents();
     }
 
     @GetMapping("/{id}")
-    public Content getContentById(@PathVariable Long id) throws ResourceNotFoundException
+    public Content getContentById(@PathVariable Long id)
     {
         return contentService.getContentById(id);
     }
 
+    @GetMapping("/genre/{genreName}")
+    public List<Content> getContentsByGenre(@PathVariable String genreName)
+    {
+        return contentService.getContentsByGenre(genreName);
+    }
+
     @PostMapping
-    public Content createContent(@RequestBody Content content) {
+    public Content createContent(@RequestBody Content content)
+    {
         return contentService.createContent(content);
     }
 
     @PutMapping("/{id}")
-    public Content updateContent(@PathVariable Long id, @RequestBody Content updatedContent) throws ResourceNotFoundException
+    public Content updateContent(@PathVariable Long id, @RequestBody Content updatedContent)
     {
         return contentService.updateContent(id, updatedContent);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteContent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteContent(@PathVariable Long id)
+    {
         contentService.deleteContent(id);
         return ResponseEntity.noContent().build();
     }
