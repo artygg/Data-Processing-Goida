@@ -6,14 +6,10 @@ import com.example.Netflix.Referals.Referral;
 import com.example.Netflix.Referals.ReferralService;
 import com.example.Netflix.Warnings.Warning;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.swing.text.html.Option;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -60,8 +56,6 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested user was not found"));
     }
-
-//    Leave this for SystemUser, will be transferred there later
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUserCredentials(@PathVariable Long id,

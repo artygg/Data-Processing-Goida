@@ -1,5 +1,7 @@
 package com.example.Netflix.Security;
 
+import com.example.Netflix.ApiUsers.ApiUser;
+import com.example.Netflix.ApiUsers.ApiUserService;
 import com.example.Netflix.Users.User;
 import com.example.Netflix.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +16,16 @@ import java.util.Optional;
 @Service
 public class CustomDetailsService implements UserDetailsService {
     @Autowired
-    private UserService userService;
+    private ApiUserService apiUserService;
 
     @Override
-    public UserDetails loadUserByUsername(String email) {
-        Optional<User> optionalUser = userService.findUserByEmail(email);
+    public UserDetails loadUserByUsername(String login) {
+        Optional<ApiUser> optionalUser = apiUserService.findApiUserByLogin(login);
 
         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+            ApiUser apiUser = optionalUser.get();
 
-            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
+            return new org.springframework.security.core.userdetails.User(apiUser.getLogin(), apiUser.getPassword(), new ArrayList<>());
         }
 
         throw new UsernameNotFoundException("User was not found");

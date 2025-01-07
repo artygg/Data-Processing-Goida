@@ -1,22 +1,23 @@
-package com.example.Netflix.SystemUsers;
+package com.example.Netflix.ApiUsers;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
-public class SystemUser {
+public class ApiUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true)
     private String login;
     private String password;
     private String token;
 
-    public SystemUser() {
+    public ApiUser() {
 
     }
 
-    public SystemUser(String login,
-                      String password) {
+    public ApiUser(String login,
+                   String password) {
         this.login = login;
         this.password = password;
     }
