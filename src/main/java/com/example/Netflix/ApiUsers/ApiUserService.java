@@ -27,6 +27,10 @@ public class ApiUserService {
                                     String password) {
         Optional<ApiUser> optionalSystemUser = apiUserRepository.findSystemUserByLogin(login);
 
+        if (login.isEmpty() || password.isEmpty()) {
+            return;
+        }
+
         if (optionalSystemUser.isEmpty()) {
             ApiUser apiUser = new ApiUser();
 

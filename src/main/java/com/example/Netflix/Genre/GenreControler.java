@@ -1,7 +1,9 @@
 package com.example.Netflix.Genre;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,13 +25,19 @@ public class GenreControler
     }
 
     @PostMapping
-    public ResponseEntity<Genre> createGenre(@RequestBody Genre genre) {
+    public ResponseEntity<?> createGenre(@RequestBody Genre genre) {
         try {
-            Genre savedGenre = genreService.saveGenre(genre);
-            return ResponseEntity.ok(savedGenre);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(409).body(null);
+            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+            try {
+                Genre savedGenre = genreService.saveGenre(genre);
+                return ResponseEntity.ok(savedGenre);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(409).body(null);
+            }
+        } catch (ClassCastException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request");
         }
     }
 }

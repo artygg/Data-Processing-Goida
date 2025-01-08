@@ -1,9 +1,10 @@
 package com.example.Netflix.Content;
 
 import com.example.Netflix.Genre.Genre;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.example.Netflix.Resolutions.Resolution;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -11,6 +12,7 @@ import java.util.Set;
 public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "content_id")
     private Long id;
 
     private String title;
@@ -27,6 +29,13 @@ public class Content {
     private Integer seriesId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @ManyToMany
+    @JoinTable(
+            name = "quality_ranges",
+            joinColumns = @JoinColumn(name = "content_id"),
+            inverseJoinColumns = @JoinColumn(name = "resolution_id")
+    )
+    private List<Resolution> resolutions;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -168,6 +177,14 @@ public class Content {
     public void setGenres(Set<Genre> genres)
     {
         this.genres = genres;
+    }
+
+    public List<Resolution> getResolutions() {
+        return this.resolutions;
+    }
+
+    public void setResolutions(List<Resolution> resolutions) {
+        this.resolutions = resolutions;
     }
 }
 

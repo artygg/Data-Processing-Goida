@@ -1,6 +1,8 @@
 package com.example.Netflix.Subtitle;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +22,25 @@ public class SubtitleController {
     }
 
     @PostMapping
-    public Subtitle createSubtitle(@RequestBody Subtitle subtitle) {
-        return subtitleService.createSubtitle(subtitle);
+    public ResponseEntity<?> createSubtitle(@RequestBody Subtitle subtitle) {
+        try {
+            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+            return ResponseEntity.ok(subtitleService.createSubtitle(subtitle));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{contentId}/{language}")
-    public ResponseEntity<Void> deleteSubtitle(@PathVariable Long contentId, @PathVariable String language) {
-        subtitleService.deleteSubtitle(contentId, language);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteSubtitle(@PathVariable Long contentId, @PathVariable String language) {
+        try {
+            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+
+            subtitleService.deleteSubtitle(contentId, language);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
+        }
     }
 }
