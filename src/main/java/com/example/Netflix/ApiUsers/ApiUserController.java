@@ -2,6 +2,10 @@ package com.example.Netflix.ApiUsers;
 
 import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.JWT.JwtTokenFactory;
+import com.example.Netflix.RefreshTokens.RefreshToken;
+import com.example.Netflix.RefreshTokens.RefreshTokenDTO;
+import com.example.Netflix.RefreshTokens.RefreshTokenService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -28,6 +33,8 @@ public class ApiUserController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtTokenFactory jwtTokenFactory;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody ApiUser apiUserServiceBody) {
@@ -50,11 +57,14 @@ public class ApiUserController {
                     SecurityContextHolder.setContext(contextHolder);
                     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                     String jwt = jwtTokenFactory.generateToken(userDetails.getUsername());
+                    RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
 
                     user.setToken(jwt);
                     apiUserService.updateSystemUser(user);
 
-                    return ResponseEntity.ok(user);
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.SET_COOKIE, "refreshToken=" + refreshToken.getToken() + "; HttpOnly; Secure; Path=/api/auth/refresh; Max-Age=604800")
+                            .body(Map.of("user", user));
                 } catch (BadCredentialsException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Wrong credentials"));
                 } catch (Exception e) {
@@ -63,5 +73,28 @@ public class ApiUserController {
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("User does not exist"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenService.findRefreshTokenByToken(refreshTokenDTO.getToken());
+
+        if (optionalRefreshToken.isPresent()) {
+            RefreshToken refreshToken = optionalRefreshToken.get();
+
+            Optional<ApiUser> optionalApiUser = apiUserService.findApiUserByLogin(refreshToken.getUsername());
+
+            if (optionalApiUser.isPresent()) {
+                ApiUser apiUser = optionalApiUser.get();
+
+                apiUser.setToken(null);
+                refreshTokenService.deleteRefreshTokenByToken(refreshTokenDTO.getToken());
+                apiUserService.updateSystemUser(apiUser);
+
+                return ResponseEntity.ok("Successfully logged out");
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request");
     }
 }

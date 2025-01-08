@@ -45,10 +45,6 @@ public class SecurityConfig {
                         .requestMatchers("/users/**", "/content/**", "/genre", "/api-user/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .logout((logout) -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .deleteCookies("JSESSIONID")
-                )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
