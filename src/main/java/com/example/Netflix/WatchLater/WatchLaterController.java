@@ -1,5 +1,6 @@
 package com.example.Netflix.WatchLater;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,15 +15,18 @@ public class WatchLaterController {
         this.watchLaterService = watchLaterService;
     }
 
-    @GetMapping("/profile/{profileId}")
+    @GetMapping(value = "/profile/{profileId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<WatchLater> getWatchLaterByProfileId(@PathVariable Long profileId) {
         return watchLaterService.getWatchLaterByProfileId(profileId);
     }
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public WatchLater addWatchLater(@RequestBody WatchLater watchLater) {
         return watchLaterService.addWatchLater(watchLater);
     }
+
 
     @DeleteMapping("/profile/{profileId}/content/{contentId}")
     public ResponseEntity<Void> deleteWatchLater(@PathVariable Long profileId, @PathVariable Long contentId) {

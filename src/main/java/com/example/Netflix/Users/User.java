@@ -118,4 +118,5 @@ public class User {
     public void setHasUsedReferralLink(boolean hasUsedReferralLink) {
         this.hasUsedReferralLink = hasUsedReferralLink;
     }
+
 }

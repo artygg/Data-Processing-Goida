@@ -2,6 +2,7 @@ package com.example.Netflix.Referals;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,8 @@ public class ReferralController {
     @Autowired
     private ReferralService referralService;
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> saveReferralProcedure(@RequestBody Referral referralBody) {
         Referral referral = new Referral();
         referral.setHostId(referralBody.getHostId());
@@ -28,13 +30,13 @@ public class ReferralController {
         return ResponseEntity.ok("Referral procedure was saved successfully");
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getReferralByInvitedId(@PathVariable Long id) {
         try {
             Optional<Referral> optionalReferral = referralService.getReferralByInvitedId(id);
 
             if (optionalReferral.isPresent()) {
-                 Referral referral = optionalReferral.get();
+                Referral referral = optionalReferral.get();
 
                 return ResponseEntity.ok(referral);
             } else {

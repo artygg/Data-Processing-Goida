@@ -11,6 +11,7 @@ import com.example.Netflix.enums.Genre;
 import com.example.Netflix.enums.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,8 @@ public class ProfileController {
     @Autowired
     private UserService userService;
 
-    @PostMapping()
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createProfile(@RequestBody ProfileDTO profileBody) throws ProfileLimitReached {
         String email;
 
@@ -66,7 +68,7 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested user was not found"));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getProfile(@PathVariable UUID id) {
         String email;
 
@@ -92,7 +94,9 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested user does not exist");
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateProfile(@PathVariable UUID id,
                                            @RequestBody ProfileDTO profileBody) {
         try {
@@ -129,7 +133,9 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested profile was not found"));
     }
 
-    @PutMapping("/{id}/preferences")
+    @PutMapping(value = "/{id}/preferences",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> addPreferences(@PathVariable UUID id,
                                             @RequestBody PreferencesRequest preferencesRequest) {
         try {
@@ -137,19 +143,18 @@ public class ProfileController {
         } catch (ClassCastException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Failed to authenticate"));
         }
-        System.out.println("IsInterested: " + preferencesRequest.isInterestedInFilms());
 
         Optional<Profile> optionalProfile = profileService.findProfileById(id);
         List<Genre> convertedGenres = new ArrayList<>();
         List<Classification> convertedClassifications = new ArrayList<>();
 
         if (preferencesRequest.getGenres() != null || !preferencesRequest.getGenres().isEmpty()) {
-
             for (String genre : preferencesRequest.getGenres()) {
                 Genre convertedGenre = Genre.valueOf(genre.toUpperCase());
                 convertedGenres.add(convertedGenre);
             }
         }
+
         if (preferencesRequest.getClassifications() != null || !preferencesRequest.getClassifications().isEmpty()) {
             for (String classification : preferencesRequest.getClassifications()) {
                 Classification convertedClassification = Classification.valueOf(classification.toUpperCase());

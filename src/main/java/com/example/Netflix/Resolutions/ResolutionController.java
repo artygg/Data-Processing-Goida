@@ -2,6 +2,7 @@ package com.example.Netflix.Resolutions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,8 @@ public class ResolutionController {
     @Autowired
     private ResolutionService resolutionService;
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createResolution(@RequestBody Resolution resolution) {
         try {
             ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
@@ -27,7 +29,8 @@ public class ResolutionController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getResolution(@PathVariable int id) {
         try {
             Optional<Resolution> optionalResolution = resolutionService.findResolutionById(id);
@@ -44,7 +47,7 @@ public class ResolutionController {
         }
     }
 
-    @GetMapping
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<Resolution> findAllResolutions() {
         return resolutionService.findAllResolutions();
     }

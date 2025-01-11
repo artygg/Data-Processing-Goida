@@ -7,6 +7,7 @@ import com.example.Netflix.Referals.ReferralService;
 import com.example.Netflix.Warnings.Warning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -21,28 +23,34 @@ public class UserController {
     @Autowired
     private ReferralService referralService;
 
-    @PostMapping("/registration")
+    @PostMapping(value = "/registration",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> registration(@RequestBody UserRequestBody userRequestBody) {
         String email = userRequestBody.getEmail();
+
+        if (userService.findUserByEmail(email).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseMessage("Email is already taken"));
+        }
+
         User user = new User();
         String jwt = jwtTokenFactory.generateToken(email);
         Warning warning = new Warning();
 
-        if (userService.findUserByEmail(email).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Email is taken"));
-        }
-
         user.setEmail(email);
-        user.setWarning(warning);
-        warning.setUser(user);
         user.setPassword(userRequestBody.getPassword());
         user.setToken(jwt);
+        user.setWarning(warning);
+        warning.setUser(user);
+
         userService.saveUser(user);
 
-        return ResponseEntity.ok(new ResponseMessage("User was registered successfully"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseMessage("User was registered successfully"));
     }
 
-    @GetMapping("/login")
+    @GetMapping(value = "/login",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> login(@RequestBody UserRequestBody userRequestBody) {
         String email = userRequestBody.getEmail();
 
@@ -50,14 +58,16 @@ public class UserController {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-
             return ResponseEntity.ok(user);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested user was not found"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseMessage("Requested user was not found"));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateUserCredentials(@PathVariable Long id,
                                                    @RequestBody UserRequestBody userRequestBody) {
         Optional<User> optionalUser = userService.findUserByUserId(id);
@@ -65,53 +75,53 @@ public class UserController {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
-            if (!userService.isBanned(user)) {
-                user.setPassword(
-                        userRequestBody.getPassword() != null ?
-                                userRequestBody.getPassword() :
-                                user.getPassword());
-                user.setEmail(
-                        userRequestBody.getEmail() != null ?
-                                userRequestBody.getEmail() :
-                                user.getEmail()
-                );
-                userService.saveUser(user);
-
-                return ResponseEntity.ok(user);
+            if (userService.isBanned(user)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ResponseMessage("User is banned"));
             }
 
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMessage("User is banned"));
+            user.setEmail(userRequestBody.getEmail() != null ? userRequestBody.getEmail() : user.getEmail());
+            user.setPassword(userRequestBody.getPassword() != null ? userRequestBody.getPassword() : user.getPassword());
+
+            userService.saveUser(user);
+            return ResponseEntity.ok(user);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Requested user was not found"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseMessage("Requested user was not found"));
     }
 
-    @PostMapping("/invite/{id}")
+    @PostMapping(value = "/invite/{id}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> inviteUserWithReferralLink(@PathVariable Long id,
                                                         @RequestBody User userBody) {
         Optional<User> optionalHostUser = userService.findUserByUserId(userBody.getId());
         Optional<User> optionalInvitedUser = userService.findUserByUserId(id);
 
-        if (optionalHostUser.isPresent()) {
-            User hostUser = optionalHostUser.get();
-
-            if (optionalInvitedUser.isPresent()) {
-                User invitedUser = optionalInvitedUser.get();
-                Referral referral = new Referral();
-
-                referral.setInvitedId(invitedUser.getId());
-                referral.setHostId(hostUser.getId());
-
-                referralService.saveReferral(referral);
-                hostUser.setHasUsedReferralLink(true);
-                userService.updateUser(hostUser);
-
-                return ResponseEntity.ok("Referral was successfully saved");
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested user to invite was not found");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested host was not found");
+        if (optionalHostUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseMessage("Requested host was not found"));
         }
+
+        User hostUser = optionalHostUser.get();
+
+        if (optionalInvitedUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseMessage("Requested user to invite was not found"));
+        }
+
+        User invitedUser = optionalInvitedUser.get();
+        Referral referral = new Referral();
+
+        referral.setInvitedId(invitedUser.getId());
+        referral.setHostId(hostUser.getId());
+
+        referralService.saveReferral(referral);
+
+        hostUser.setHasUsedReferralLink(true);
+        userService.updateUser(hostUser);
+
+        return ResponseEntity.ok(new ResponseMessage("Referral was successfully saved"));
     }
 }

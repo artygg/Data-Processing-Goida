@@ -2,6 +2,7 @@ package com.example.Netflix.Genre;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -9,25 +10,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/genre")
-public class GenreControler
-{
+@RequestMapping("/genres")
+public class GenreControler {
     private final GenreService genreService;
 
     @Autowired
-    public GenreControler(GenreService genreService)
-    {
+    public GenreControler(GenreService genreService) {
         this.genreService = genreService;
     }
-    @GetMapping
+
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<Genre> getAllGenres() {
         return genreService.getAllGenres();
     }
 
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createGenre(@RequestBody Genre genre) {
         try {
-            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
+                    .getAuthentication().getPrincipal()).getUsername();
 
             try {
                 Genre savedGenre = genreService.saveGenre(genre);
