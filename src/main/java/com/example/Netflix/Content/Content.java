@@ -2,6 +2,7 @@ package com.example.Netflix.Content;
 
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Resolutions.Resolution;
+import com.example.Netflix.enums.ContentType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;

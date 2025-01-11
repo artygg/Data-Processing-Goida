@@ -1,4 +1,4 @@
-package com.example.Netflix.Content;
+package com.example.Netflix.enums;
 
 public enum ContentType
 {
