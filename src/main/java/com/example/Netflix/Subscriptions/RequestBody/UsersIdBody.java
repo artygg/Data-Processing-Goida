@@ -1,9 +1,13 @@
 package com.example.Netflix.Subscriptions.RequestBody;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.UUID;
 
 public class UsersIdBody {
+    @NotBlank(message = "Host id required")
     private UUID inviterProfileId;
+    @NotBlank(message = "Invited user id required")
     private UUID inviteeProfileId;
 
     public UsersIdBody() {

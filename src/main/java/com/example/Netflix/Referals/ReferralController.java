@@ -1,5 +1,6 @@
 package com.example.Netflix.Referals;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/referrals")
@@ -16,7 +18,7 @@ public class ReferralController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> saveReferralProcedure(@RequestBody Referral referralBody) {
+    public ResponseEntity<?> saveReferralProcedure(@RequestBody @Valid Referral referralBody) {
         Referral referral = new Referral();
         referral.setHostId(referralBody.getHostId());
         referral.setInvitedId(referralBody.getInvitedId());
@@ -31,7 +33,7 @@ public class ReferralController {
     }
 
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getReferralByInvitedId(@PathVariable Long id) {
+    public ResponseEntity<?> getReferralByInvitedId(@PathVariable UUID id) {
         try {
             Optional<Referral> optionalReferral = referralService.getReferralByInvitedId(id);
 

@@ -1,6 +1,7 @@
 package com.example.Netflix.Subscriptions;
 
 import com.example.Netflix.Subscriptions.RequestBody.UsersIdBody;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class SubscriptionController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createSubscription(@RequestBody Subscription subscriptionBody) {
+    public ResponseEntity<?> createSubscription(@RequestBody @Valid Subscription subscriptionBody) {
         LocalDate start = LocalDate.parse(subscriptionBody.getStartDate().toString());
         LocalDate end = (subscriptionBody.getEndDate() != null) ? LocalDate.parse(subscriptionBody.getEndDate().toString()) : null;
 
@@ -44,7 +45,7 @@ public class SubscriptionController {
     @PostMapping(value = "/invite",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> inviteUserForDiscount(@RequestBody UsersIdBody usersIdBody) {
+    public ResponseEntity<?> inviteUserForDiscount(@RequestBody @Valid UsersIdBody usersIdBody) {
         try {
             subscriptionService.applyDiscountForInvitation(usersIdBody.getInviterProfileId(), usersIdBody.getInviteeProfileId());
             return ResponseEntity.ok("Discount applied successfully if eligible.");

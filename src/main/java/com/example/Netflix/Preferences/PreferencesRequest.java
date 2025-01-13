@@ -1,8 +1,6 @@
 package com.example.Netflix.Preferences;
 
-import com.example.Netflix.enums.Classification;
-import com.example.Netflix.enums.Genre;
-import jakarta.persistence.*;
+import com.example.Netflix.Genre.Genre;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.List;
 public class PreferencesRequest {
     private boolean isInterestedInSeries;
     private boolean isInterestedInFilms;
-    private List<String> genres;
+    private List<Genre> genres;
     private List<String> classifications;
     private boolean isInterestedInFilmsWithMinimumAge;
 
@@ -44,11 +42,11 @@ public class PreferencesRequest {
         isInterestedInFilms = interestedInFilms;
     }
 
-    public List<String> getGenres() {
+    public List<Genre> getGenres() {
         return this.genres;
     }
 
-    public void setGenres(List<String> genres) {
+    public void setGenres(List<Genre> genres) {
         this.genres = genres;
     }
 

@@ -1,9 +1,8 @@
 package com.example.Netflix.Preferences;
 
+import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Profiles.Profile;
-import com.example.Netflix.Users.User;
 import com.example.Netflix.enums.Classification;
-import com.example.Netflix.enums.Genre;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
@@ -17,8 +16,7 @@ public class Preferences {
     private int id;
     private boolean isInterestedInSeries;
     private boolean isInterestedInFilms;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
+    @OneToMany
     private List<Genre> genres;
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)

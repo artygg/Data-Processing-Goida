@@ -7,12 +7,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findAllByType(ContentType type);
 
     List<Content> findAllByTypeAndSeriesId(ContentType type, Integer seriesId);
+
+    Optional<Content> findContentById(Long id);
 
     @Query("SELECT c FROM Content c JOIN c.genres g WHERE g.name = :genreName")
     List<Content> findAllByGenreName(@Param("genreName") String genreName);

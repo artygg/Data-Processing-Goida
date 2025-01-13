@@ -7,7 +7,9 @@ import com.example.Netflix.Warnings.Warning;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
+import java.rmi.server.UID;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -16,8 +18,10 @@ import java.util.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
+    @NotBlank(message = "Email is required")
     private String email;
+    @NotBlank(message = "Password is required")
     private String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -47,11 +51,11 @@ public class User {
         this.hasUsedReferralLink = hasUsedReferralLink;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return this.id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

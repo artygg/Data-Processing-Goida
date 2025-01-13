@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ReferralService {
@@ -14,7 +15,7 @@ public class ReferralService {
         referralRepository.save(referral);
     }
 
-    public Optional<Referral> getReferralByInvitedId(Long id) {
+    public Optional<Referral> getReferralByInvitedId(UUID id) {
         return  referralRepository.findReferralByInvitedId(id);
     }
 }

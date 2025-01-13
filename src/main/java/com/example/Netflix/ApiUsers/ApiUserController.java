@@ -5,6 +5,7 @@ import com.example.Netflix.JWT.JwtTokenFactory;
 import com.example.Netflix.RefreshTokens.RefreshToken;
 import com.example.Netflix.RefreshTokens.RefreshTokenDTO;
 import com.example.Netflix.RefreshTokens.RefreshTokenService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,7 +38,7 @@ public class ApiUserController {
     private RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody ApiUser apiUserServiceBody) {
+    public ResponseEntity<?> login(@RequestBody @Valid ApiUser apiUserServiceBody) {
         Optional<ApiUser> optionalUser = apiUserService.findApiUserByLogin(apiUserServiceBody.getLogin());
         ApiUser user;
 
@@ -76,7 +77,7 @@ public class ApiUserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+    public ResponseEntity<?> logout(@RequestBody @Valid RefreshTokenDTO refreshTokenDTO) {
         Optional<RefreshToken> optionalRefreshToken = refreshTokenService.findRefreshTokenByToken(refreshTokenDTO.getToken());
 
         if (optionalRefreshToken.isPresent()) {

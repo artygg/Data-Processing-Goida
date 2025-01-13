@@ -1,5 +1,6 @@
 package com.example.Netflix.Genre;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ public class GenreControler {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createGenre(@RequestBody Genre genre) {
+    public ResponseEntity<?> createGenre(@RequestBody @Valid Genre genre) {
         try {
             ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
                     .getAuthentication().getPrincipal()).getUsername();

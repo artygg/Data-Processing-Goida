@@ -2,6 +2,8 @@ package com.example.Netflix.Subscriptions;
 
 import com.example.Netflix.Profiles.Profile;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -14,15 +16,19 @@ public class Subscription {
 
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
+    @NotBlank(message = "Profile is required")
     private Profile profile;
 
     @Column(name = "price_id", nullable = false)
+    @NotBlank(message = "Price id is required")
     private Integer priceId;
 
     @Column(name = "start_date", nullable = false)
+    @NotBlank(message = "Start date required")
     private LocalDate startDate;
 
     @Column(name = "end_date")
+    @NotBlank(message = "End date required")
     private LocalDate endDate;
 
     public Subscription() {

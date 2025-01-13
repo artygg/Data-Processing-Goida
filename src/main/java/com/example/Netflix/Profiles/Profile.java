@@ -7,6 +7,7 @@ import com.example.Netflix.WatchHistory.WatchHistory;
 import com.example.Netflix.enums.Language;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +33,8 @@ public class Profile {
     private List<WatchHistory> watchHistories;
     @OneToMany
     private List<Content> watchList;
+    @ManyToMany
+    private List<Content> watchLater;
     private boolean isChild;
 
     public Profile() {
@@ -88,6 +91,14 @@ public class Profile {
         return this.age;
     }
 
+    public List<Content> getWatchLater() {
+        return this.watchLater;
+    }
+
+    public void setWatchLater(List<Content> watchLater) {
+        this.watchLater = watchLater;
+    }
+
     public void setAge(LocalDate age) {
         this.age = age;
         setChild(age.getYear() - LocalDate.now().getYear() >= 18);
@@ -131,5 +142,9 @@ public class Profile {
 
     public void setChild(boolean child) {
         isChild = child;
+    }
+
+    public void addWatchLater(Content content) {
+        this.watchLater.add(content);
     }
 }

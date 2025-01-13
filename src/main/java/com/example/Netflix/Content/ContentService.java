@@ -7,6 +7,8 @@ import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.Resolutions.ResolutionRepository;
 import com.example.Netflix.enums.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,34 +46,51 @@ public class ContentService {
         return contentRepository.findAllByType(ContentType.SERIES);
     }
 
-    public List<Content> getEpisodesBySeriesId(Integer seriesId) {
-        return contentRepository.findAllByTypeAndSeriesId(ContentType.EPISODE, seriesId);
+    public ResponseEntity<?> getEpisodesBySeriesId(Integer seriesId) {
+        try {
+            return ResponseEntity.ok(contentRepository.findAllByTypeAndSeriesId(ContentType.EPISODE, seriesId));
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    public List<Content> getContentsByGenre(String genreName) {
-        return contentRepository.findAllByGenreName(genreName);
+    public ResponseEntity<?> getContentsByGenre(String genreName) {
+        try {
+            return ResponseEntity.ok(contentRepository.findAllByGenreName(genreName));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    public List<Content> getContentsByResolution(Long resolutionId) {
-        return contentRepository.findAllByResolutionId(resolutionId);
+    public ResponseEntity<?> getContentsByResolution(Long resolutionId) {
+        try {
+            return ResponseEntity.ok(contentRepository.findAllByResolutionId(resolutionId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     public Content createContent(Content content) {
         return contentRepository.save(content);
     }
 
-    public Content updateContent(Long id, Content updatedContent) throws ResourceNotFoundException {
-        Content existingContent = getContentById(id);
-        existingContent.setTitle(updatedContent.getTitle());
-        existingContent.setDescription(updatedContent.getDescription());
-        existingContent.setVideoLink(updatedContent.getVideoLink());
-        existingContent.setDuration(updatedContent.getDuration());
-        existingContent.setType(updatedContent.getType());
-        existingContent.setSeason(updatedContent.getSeason());
-        existingContent.setEpisodeNumber(updatedContent.getEpisodeNumber());
-        existingContent.setSeriesId(updatedContent.getSeriesId());
-        existingContent.setUpdatedAt(LocalDateTime.now());
-        return contentRepository.save(existingContent);
+    public ResponseEntity<?> updateContent(Long id, Content updatedContent) throws ResourceNotFoundException {
+        try {
+            Content existingContent = getContentById(id);
+            existingContent.setTitle(updatedContent.getTitle());
+            existingContent.setDescription(updatedContent.getDescription());
+            existingContent.setVideoLink(updatedContent.getVideoLink());
+            existingContent.setDuration(updatedContent.getDuration());
+            existingContent.setType(updatedContent.getType());
+            existingContent.setSeason(updatedContent.getSeason());
+            existingContent.setEpisodeNumber(updatedContent.getEpisodeNumber());
+            existingContent.setSeriesId(updatedContent.getSeriesId());
+            existingContent.setUpdatedAt(LocalDateTime.now());
+
+            return ResponseEntity.ok(contentRepository.save(existingContent));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     public void deleteContent(Long id) {
@@ -82,6 +101,10 @@ public class ContentService {
         episode.setSeriesId(seriesId);
         episode.setType(ContentType.EPISODE);
         contentRepository.save(episode);
+    }
+
+    public Optional<Content> findById(Long id) {
+        return contentRepository.findById(id);
     }
 
     public void addGenreToContent(Long contentId, Long genreId) throws ResourceNotFoundException

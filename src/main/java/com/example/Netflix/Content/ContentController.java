@@ -41,17 +41,17 @@ public class ContentController {
     }
 
     @GetMapping(value = "/series/{seriesId}/episodes", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<Content> getEpisodesBySeriesId(@PathVariable Integer seriesId) {
+    public ResponseEntity<?> getEpisodesBySeriesId(@PathVariable Integer seriesId) {
         return contentService.getEpisodesBySeriesId(seriesId);
     }
 
     @GetMapping(value = "/genre/{genreName}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<Content> getContentsByGenre(@PathVariable String genreName) {
+    public ResponseEntity<?> getContentsByGenre(@PathVariable String genreName) {
         return contentService.getContentsByGenre(genreName);
     }
 
     @GetMapping(value = "/resolution/{resolutionId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<Content> getContentsByResolution(@PathVariable Long resolutionId) {
+    public ResponseEntity<?> getContentsByResolution(@PathVariable Long resolutionId) {
         return contentService.getContentsByResolution(resolutionId);
     }
 

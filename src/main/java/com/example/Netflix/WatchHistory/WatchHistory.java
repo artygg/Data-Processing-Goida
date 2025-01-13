@@ -2,6 +2,9 @@ package com.example.Netflix.WatchHistory;
 
 import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "watch_histories")
@@ -10,23 +13,29 @@ public class WatchHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "profile_id") // Explicit mapping
-    private Long profileId;
+    @Column(name = "profile_id")
+    @NotBlank(message = "Profile id required")
+    private UUID profileId;
 
-    @Column(name = "content_id") // Explicit mapping
+    @Column(name = "content_id")
+    @NotBlank(message = "Content is required")
     private Long contentId;
 
-    @Column(name = "stopped_at") // Explicit mapping
+    @Column(name = "stopped_at")
+    @NotBlank(message = "Time stamp is required")
     private Double stoppedAt;
 
-    @Column(name = "progress") // Explicit mapping
+    @Column(name = "progress")
+    @NotBlank(message = "Progress required")
     private Double progress;
 
-    @Column(name = "watching_times") // Explicit mapping
+    @Column(name = "watching_times")
+    @NotBlank(message = "Watching times required")
     private Integer watchingTimes;
 
     @ManyToOne
-    @JoinColumn(name = "content_id", insertable = false, updatable = false) // Avoid duplicate mapping
+    @JoinColumn(name = "content_id", insertable = false, updatable = false)
+    @NotBlank(message = "Content id required")
     private Content content;
 
     public WatchHistory()
@@ -43,12 +52,12 @@ public class WatchHistory {
         this.id = id;
     }
 
-    public Long getProfileId()
+    public UUID getProfileId()
     {
         return profileId;
     }
 
-    public void setProfileId(Long profileId)
+    public void setProfileId(UUID profileId)
     {
         this.profileId = profileId;
     }

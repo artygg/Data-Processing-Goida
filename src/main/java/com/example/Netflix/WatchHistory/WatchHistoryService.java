@@ -3,6 +3,7 @@ package com.example.Netflix.WatchHistory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class WatchHistoryService {
@@ -12,7 +13,7 @@ public class WatchHistoryService {
         this.watchHistoryRepository = watchHistoryRepository;
     }
 
-    public List<WatchHistory> getWatchHistoryByProfileId(Long profileId) {
+    public List<WatchHistory> getWatchHistoryByProfileId(UUID profileId) {
         return watchHistoryRepository.findAllByProfileId(profileId);
     }
 

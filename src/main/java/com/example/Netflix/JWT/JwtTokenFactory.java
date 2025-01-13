@@ -40,9 +40,9 @@ public class JwtTokenFactory {
             return true;
         } catch (JwtException e) {
             System.out.println("Error related to the token");
-        }
 
-        return false;
+            return false;
+        }
     }
 
     public String getUsernameFromToken(String token) {

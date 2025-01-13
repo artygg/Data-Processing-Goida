@@ -1,6 +1,7 @@
 package com.example.Netflix.ApiUsers;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class ApiUser {
@@ -8,7 +9,9 @@ public class ApiUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(unique = true)
+    @NotBlank(message = "Login is required")
     private String login;
+    @NotBlank(message = "Password is required")
     private String password;
     private String token;
 

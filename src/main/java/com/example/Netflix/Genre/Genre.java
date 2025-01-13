@@ -4,6 +4,8 @@ import com.example.Netflix.Content.Content;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Set;
 
 @Entity
@@ -13,10 +15,12 @@ public class Genre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name is required")
     private String name;
 
     @JsonBackReference
     @ManyToMany(mappedBy = "genres")
+    @NotBlank(message = "Content is required")
     private Set<Content> contents;
 
 

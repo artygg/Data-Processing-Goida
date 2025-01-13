@@ -1,41 +1,19 @@
 package com.example.Netflix.Profiles;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
-
-public class ProfileDTO {
-    @NotNull
-    private UUID userID;
+public class UpdateProfileDTO {
     private String language;
-    @NotBlank(message = "Profile name is required")
     private String profileName;
     private String profilePhoto;
     private String age;
 
-    public ProfileDTO() {
-
-    }
-
-    public ProfileDTO(UUID userID,
-                      String language,
-                      String profileName,
-                      String profilePhoto,
-                      String age) {
-        this.userID = userID;
+    public UpdateProfileDTO(String language,
+                            String profileName,
+                            String profilePhoto,
+                            String age) {
         this.language = language;
         this.profileName = profileName;
         this.profilePhoto = profilePhoto;
         this.age = age;
-    }
-
-    public UUID getUserID() {
-        return this.userID;
-    }
-
-    public void setUserID(UUID userID) {
-        this.userID = userID;
     }
 
     public String getLanguage() {

@@ -1,5 +1,6 @@
 package com.example.Netflix.Prices;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class PriceController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createPrice(@RequestBody Price price) {
+    public ResponseEntity<?> createPrice(@RequestBody @Valid Price price) {
         try {
             ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
                     .getAuthentication().getPrincipal()).getUsername();

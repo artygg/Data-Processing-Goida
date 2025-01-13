@@ -4,6 +4,8 @@ import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.enums.ContentType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -15,14 +17,19 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "content_id")
     private Long id;
-
+    @NotBlank(message = "Title is required")
     private String title;
+    @NotBlank(message = "Poster is required")
     private String poster;
+    @NotBlank(message = "Description is required")
     private String description;
+    @NotBlank(message = "Video link is required")
     private String videoLink;
+    @NotBlank(message = "Duration is required")
     private Double duration;
 
     @Enumerated(EnumType.STRING)
+    @NotBlank(message = "Content type is required")
     private ContentType type;
 
     private Integer season;

@@ -2,6 +2,7 @@ package com.example.Netflix.Resolutions;
 
 import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -11,7 +12,9 @@ public class Resolution {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "resolution_id")
     private Integer id;
+    @NotBlank(message = "Name is required")
     private String name;
+    @NotBlank(message = "Content is required")
     @ManyToMany
     private List<Content> contents;
 

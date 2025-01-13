@@ -1,6 +1,7 @@
 package com.example.Netflix.Subtitle;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class SubtitleController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createSubtitle(@RequestBody Subtitle subtitle) {
+    public ResponseEntity<?> createSubtitle(@RequestBody @Valid Subtitle subtitle) {
         try {
             String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             Subtitle createdSubtitle = subtitleService.createSubtitle(subtitle);

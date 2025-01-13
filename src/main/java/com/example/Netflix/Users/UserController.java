@@ -5,12 +5,14 @@ import com.example.Netflix.JWT.JwtTokenFactory;
 import com.example.Netflix.Referals.Referral;
 import com.example.Netflix.Referals.ReferralService;
 import com.example.Netflix.Warnings.Warning;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -26,7 +28,7 @@ public class UserController {
     @PostMapping(value = "/registration",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> registration(@RequestBody UserRequestBody userRequestBody) {
+    public ResponseEntity<?> registration(@RequestBody @Valid User userRequestBody) {
         String email = userRequestBody.getEmail();
 
         if (userService.findUserByEmail(email).isPresent()) {
@@ -49,9 +51,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseMessage("User was registered successfully"));
     }
 
-    @GetMapping(value = "/login",
+    @PostMapping(value = "/login",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> login(@RequestBody UserRequestBody userRequestBody) {
+    public ResponseEntity<?> login(@RequestBody @Valid User userRequestBody) {
         String email = userRequestBody.getEmail();
 
         Optional<User> optionalUser = userService.findUserByEmail(email);
@@ -68,8 +70,8 @@ public class UserController {
     @PutMapping(value = "/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> updateUserCredentials(@PathVariable Long id,
-                                                   @RequestBody UserRequestBody userRequestBody) {
+    public ResponseEntity<?> updateUserCredentials(@PathVariable UUID id,
+                                                   @RequestBody @Valid User userRequestBody) {
         Optional<User> optionalUser = userService.findUserByUserId(id);
 
         if (optionalUser.isPresent()) {
@@ -94,9 +96,9 @@ public class UserController {
     @PostMapping(value = "/invite/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> inviteUserWithReferralLink(@PathVariable Long id,
-                                                        @RequestBody User userBody) {
-        Optional<User> optionalHostUser = userService.findUserByUserId(userBody.getId());
+    public ResponseEntity<?> inviteUserWithReferralLink(@PathVariable UUID id,
+                                                        @RequestBody @Valid UserInvitationDTO userBody) {
+        Optional<User> optionalHostUser = userService.findUserByUserId(userBody.getHostID());
         Optional<User> optionalInvitedUser = userService.findUserByUserId(id);
 
         if (optionalHostUser.isEmpty()) {
@@ -109,6 +111,10 @@ public class UserController {
         if (optionalInvitedUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseMessage("Requested user to invite was not found"));
+        }
+
+        if (hostUser.isHasUsedReferralLink()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Referral link had been used");
         }
 
         User invitedUser = optionalInvitedUser.get();
