@@ -1,12 +1,16 @@
 package com.example.Netflix.Resolutions;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
 public interface ResolutionRepository extends JpaRepository<Resolution, Integer> {
-    Optional<Resolution> findResolutionById(int id);
     void deleteResolutionById(int id);
+
+    @Query("SELECT r FROM Resolution r WHERE r.id = :resolutionId")
+    Optional<Resolution> findResolutionById(@Param("resolutionId") Integer resolutionId);
 }

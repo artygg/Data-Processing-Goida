@@ -1,8 +1,11 @@
 package com.example.Netflix.Users;
 
+import com.example.Netflix.JSON.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.mail.SimpleMailMessage;
 //import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,24 @@ public class UserService {
 
     public void updateUser(User user) {
         userRepository.save(user);
+    }
+
+    public ResponseEntity<?> updateUserCredentials(UUID id, User userRequestBody) {
+        try {
+            userRepository.updateUserCredentials(id, userRequestBody.getEmail(), userRequestBody.getPassword());
+            return ResponseEntity.ok(userRequestBody);
+        } catch (Exception e) {
+            if (e.getMessage().contains("User not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseMessage("Requested user was not found"));
+            } else if (e.getMessage().contains("User is banned")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ResponseMessage("User is banned"));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new ResponseMessage("An error occurred"));
+            }
+        }
     }
 
     public Optional<User> findUserByEmail(String email) {
@@ -66,6 +87,4 @@ public class UserService {
             }
         }
     }
-
-
 }

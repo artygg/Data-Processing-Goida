@@ -72,25 +72,7 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateUserCredentials(@PathVariable UUID id,
                                                    @RequestBody @Valid User userRequestBody) {
-        Optional<User> optionalUser = userService.findUserByUserId(id);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-
-            if (userService.isBanned(user)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new ResponseMessage("User is banned"));
-            }
-
-            user.setEmail(userRequestBody.getEmail() != null ? userRequestBody.getEmail() : user.getEmail());
-            user.setPassword(userRequestBody.getPassword() != null ? userRequestBody.getPassword() : user.getPassword());
-
-            userService.saveUser(user);
-            return ResponseEntity.ok(user);
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseMessage("Requested user was not found"));
+        return userService.updateUserCredentials(id, userRequestBody);
     }
 
     @PostMapping(value = "/invite/{id}",
@@ -98,36 +80,6 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> inviteUserWithReferralLink(@PathVariable UUID id,
                                                         @RequestBody @Valid UserInvitationDTO userBody) {
-        Optional<User> optionalHostUser = userService.findUserByUserId(userBody.getHostID());
-        Optional<User> optionalInvitedUser = userService.findUserByUserId(id);
-
-        if (optionalHostUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseMessage("Requested host was not found"));
-        }
-
-        User hostUser = optionalHostUser.get();
-
-        if (optionalInvitedUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseMessage("Requested user to invite was not found"));
-        }
-
-        if (hostUser.isHasUsedReferralLink()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Referral link had been used");
-        }
-
-        User invitedUser = optionalInvitedUser.get();
-        Referral referral = new Referral();
-
-        referral.setInvitedId(invitedUser.getId());
-        referral.setHostId(hostUser.getId());
-
-        referralService.saveReferral(referral);
-
-        hostUser.setHasUsedReferralLink(true);
-        userService.updateUser(hostUser);
-
-        return ResponseEntity.ok(new ResponseMessage("Referral was successfully saved"));
+        return referralService.createReferral(userBody.getHostID(), id);
     }
 }

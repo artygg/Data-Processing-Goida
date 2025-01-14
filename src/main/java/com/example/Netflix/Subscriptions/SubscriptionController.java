@@ -22,6 +22,7 @@ public class SubscriptionController {
     public ResponseEntity<?> startTrial(@PathVariable UUID id) {
         try {
             Subscription trial = subscriptionService.startTrial(id);
+
             return ResponseEntity.ok(trial);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

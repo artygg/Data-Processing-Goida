@@ -76,20 +76,21 @@ public class ContentService {
 
     public ResponseEntity<?> updateContent(Long id, Content updatedContent) throws ResourceNotFoundException {
         try {
-            Content existingContent = getContentById(id);
-            existingContent.setTitle(updatedContent.getTitle());
-            existingContent.setDescription(updatedContent.getDescription());
-            existingContent.setVideoLink(updatedContent.getVideoLink());
-            existingContent.setDuration(updatedContent.getDuration());
-            existingContent.setType(updatedContent.getType());
-            existingContent.setSeason(updatedContent.getSeason());
-            existingContent.setEpisodeNumber(updatedContent.getEpisodeNumber());
-            existingContent.setSeriesId(updatedContent.getSeriesId());
-            existingContent.setUpdatedAt(LocalDateTime.now());
+            contentRepository.updateContentById(
+                    id,
+                    updatedContent.getTitle(),
+                    updatedContent.getDescription(),
+                    updatedContent.getVideoLink(),
+                    updatedContent.getDuration(),
+                    updatedContent.getType().toString(),
+                    updatedContent.getSeason(),
+                    updatedContent.getEpisodeNumber(),
+                    updatedContent.getSeriesId()
+            );
 
-            return ResponseEntity.ok(contentRepository.save(existingContent));
+            return ResponseEntity.ok(contentRepository.findContentById(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update content: " + e.getMessage());
         }
     }
 
