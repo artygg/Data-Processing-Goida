@@ -42,7 +42,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users/**", "/contents/**", "/genre", "/api-user/**", "/api/watchHistory/**").permitAll()
+                        .requestMatchers("/users/**", "/referrals/**", "/subscriptions/**", "/contents/**", "/genre", "/api-user/**", "/api/watchHistory/**", "/resolutions/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

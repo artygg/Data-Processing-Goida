@@ -351,45 +351,51 @@ END;
 $$;
 ----------------------
 CREATE OR REPLACE PROCEDURE save_referral(
-    host_id UUID,
-    invited_id UUID
+    host_id_out UUID,
+    invited_id_out UUID
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-new_referral RECORD;
+    new_referral RECORD;
 BEGIN
-INSERT INTO public.referral (host_id, invited_id)
-VALUES (host_id, invited_id)
-    RETURNING * INTO new_referral;
+    -- Insert the new referral and capture the result in new_referral
+    INSERT INTO public.referral (id, host_id, invited_id)
+    VALUES (nextval('referral_id_seq'), host_id_out, invited_id_out)
+    RETURNING id, host_id, invited_id INTO new_referral;
 
-RAISE NOTICE 'Referral saved successfully with ID: %, Host ID: %, Invited ID: %',
-        new_referral.id, host_id, invited_id;
+    -- Notify of successful referral insertion
+    RAISE NOTICE 'Referral saved successfully with ID: %, Host ID: %, Invited ID: %',
+        new_referral.id, new_referral.host_id, new_referral.invited_id;
 
 EXCEPTION
     WHEN OTHERS THEN
+        -- Handle errors
         RAISE EXCEPTION 'Error saving referral: %', SQLERRM;
 END;
 $$;
+
 ----------------------
-CREATE OR REPLACE PROCEDURE get_referral_by_invited_id(
-    invited_id UUID,
-    OUT referral_id BIGINT,
-    OUT host_id UUID,
-    OUT invited_id_out UUID
+CREATE OR REPLACE FUNCTION get_referral_by_invited_id(
+    invited_id_data UUID
 )
-LANGUAGE plpgsql
+    RETURNS TABLE (
+                      referral_id_out BIGINT,
+                      host_id_out UUID,
+                      invited_id_out UUID
+                  )
+    LANGUAGE plpgsql
 AS
 $$
 BEGIN
-SELECT id, host_id, invited_id
-INTO referral_id, host_id, invited_id_out
-FROM public.referral
-WHERE invited_id = invited_id;
+    RETURN QUERY
+        SELECT id, host_id, invited_id
+        FROM public.referral
+        WHERE invited_id = invited_id_data;
 
-IF NOT FOUND THEN
-        RAISE EXCEPTION 'Referral with invited_id % not found', invited_id;
-END IF;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Referral with invited_id % not found', invited_id_data;
+    END IF;
 END;
 $$;
 ----------------------
@@ -416,7 +422,7 @@ END;
 $$;
 
 ----------------------
-CREATE OR REPLACE PROCEDURE create_trial_subscription(profile_id UUID, OUT subscription_id UUID)
+CREATE OR REPLACE PROCEDURE create_trial_subscription(profile_id UUID)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -431,48 +437,49 @@ IF NOT profile_exists THEN
 END IF;
 
 INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-VALUES (uuid_generate_v4(), start_date, end_date, profile_id, NULL)
-    RETURNING id INTO subscription_id;
+VALUES (uuid_generate_v4(), start_date, end_date, profile_id, 0.0);
 END;
 $$;
-
 ----------------------
 CREATE OR REPLACE PROCEDURE create_subscription(
     profile_id UUID,
     price_id INTEGER,
-    start_date DATE,
-    end_date DATE,
-    OUT subscription_id UUID,
-    OUT subscription_cost DOUBLE PRECISION
+    start_date_insert DATE,
+    end_date_insert DATE,
+    subscription_cost DOUBLE PRECISION,
+    OUT new_subscription_id UUID
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-profile_exists BOOLEAN;
-    cost DOUBLE PRECISION;
+    profile_exists BOOLEAN;
+    price_amount DOUBLE PRECISION;
 BEGIN
-
-SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
-
-IF NOT profile_exists THEN
+    -- Profile check
+    SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
+    IF NOT profile_exists THEN
         RAISE EXCEPTION 'Profile not found';
-END IF;
+    END IF;
 
-SELECT price INTO cost
-FROM public.price
-WHERE id = price_id;
-
-IF cost IS NULL THEN
+    -- Price validation
+    SELECT price INTO price_amount FROM public.price WHERE id = price_id;
+    IF price_amount IS NULL THEN
         RAISE EXCEPTION 'Price not found for the given price_id';
-END IF;
+    END IF;
 
-INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-VALUES (uuid_generate_v4(), start_date, end_date, profile_id, price_id)
-    RETURNING id INTO subscription_id;
+    -- Insert subscription
+    INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
+    VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id)
+    RETURNING id INTO new_subscription_id;
 
-subscription_cost := cost;
+    -- Output notice
+    RAISE NOTICE 'Subscription created successfully for Profile ID: %', profile_id;
+
+    -- Set subscription cost as output
+    subscription_cost := price_amount;
 END;
 $$;
+
 ----------------------
 CREATE OR REPLACE PROCEDURE apply_discount_for_invitation(
     inviter_profile_id UUID,

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,12 +32,19 @@ public class SubscriptionController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createSubscription(@RequestBody @Valid Subscription subscriptionBody) {
-        LocalDate start = LocalDate.parse(subscriptionBody.getStartDate().toString());
-        LocalDate end = (subscriptionBody.getEndDate() != null) ? LocalDate.parse(subscriptionBody.getEndDate().toString()) : null;
+    public ResponseEntity<?> createSubscription(@RequestBody @Valid SubscriptionDTO subscriptionBody) {
+        Date start = null;
+        Date end = null;
 
+        if (subscriptionBody.getStartDate() != null) {
+            start = subscriptionBody.getStartDate();
+        }
+
+        if (subscriptionBody.getEndDate() != null) {
+            end = subscriptionBody.getEndDate();
+        }
         try {
-            Subscription subscription = subscriptionService.createSubscription(subscriptionBody.getProfile().getId(), subscriptionBody.getPriceId(), start, end);
+            Subscription subscription = subscriptionService.createSubscription(subscriptionBody.getProfile(), subscriptionBody.getPriceId(), start, end);
             return ResponseEntity.ok(subscription);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

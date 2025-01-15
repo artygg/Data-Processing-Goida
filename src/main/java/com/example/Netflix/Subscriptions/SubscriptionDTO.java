@@ -1,24 +1,17 @@
 package com.example.Netflix.Subscriptions;
 
 import com.example.Netflix.Profiles.Profile;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
-@Entity
-@Table(name = "subscriptions")
-public class Subscription {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "profile_id", nullable = false)
+public class SubscriptionDTO {
     @NotNull
-    private Profile profile;
+    private UUID profile;
 
     @Column(name = "price_id", nullable = false)
     @NotNull
@@ -32,34 +25,24 @@ public class Subscription {
     @NotNull
     private Date endDate;
 
-    public Subscription() {
-    }
-
-    public Subscription(Profile profile, Integer priceId, Date startDate, Date endDate) {
+    public SubscriptionDTO(UUID profile,
+                           Integer priceId, Date startDate, Date endDate) {
         this.profile = profile;
         this.priceId = priceId;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getProfile() {
+        return this.profile;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(Profile profile) {
+    public void setProfile(UUID profile) {
         this.profile = profile;
     }
 
     public Integer getPriceId() {
-        return priceId;
+        return this.priceId;
     }
 
     public void setPriceId(Integer priceId) {
@@ -67,7 +50,7 @@ public class Subscription {
     }
 
     public Date getStartDate() {
-        return startDate;
+        return this.startDate;
     }
 
     public void setStartDate(Date startDate) {
@@ -75,7 +58,7 @@ public class Subscription {
     }
 
     public Date getEndDate() {
-        return endDate;
+        return this.endDate;
     }
 
     public void setEndDate(Date endDate) {

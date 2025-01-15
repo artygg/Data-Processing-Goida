@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,16 +19,16 @@ public class SubscriptionService {
     private ProfileRepository profileRepository;
 
     public Subscription startTrial(UUID profileId) {
-        subscriptionRepository.createTrialSubscription(profileId, null);
+        subscriptionRepository.createTrialSubscription(profileId);
 
         return subscriptionRepository.findLatestSubscriptionByProfileId(profileId).get();
     }
 
-    public Subscription createSubscription(UUID profileId, Integer priceId, LocalDate startDate, LocalDate endDate) {
+    public Subscription createSubscription(UUID profileId, Integer priceId, Date startDate, Date endDate) {
         UUID subscriptionId = null;
         Double subscriptionCost = 0.0;
 
-        subscriptionRepository.createSubscription(profileId, priceId, startDate, endDate, subscriptionId, subscriptionCost);
+        subscriptionRepository.createSubscription(profileId, priceId, startDate, endDate, subscriptionCost);
 
         return subscriptionRepository.findLatestSubscriptionByProfileId(profileId).get();
     }
@@ -38,9 +39,5 @@ public class SubscriptionService {
 
     public void applyDiscountForInvitation(UUID inviterProfileId, UUID inviteeProfileId) {
         subscriptionRepository.applyDiscountForInvitation(inviterProfileId, inviteeProfileId);
-    }
-
-    private boolean isEligibleForDiscount(Subscription subscription) {
-        return subscription != null && subscription.getEndDate().isAfter(LocalDate.now());
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,17 +19,16 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
 
     @Transactional
     @Modifying
-    @Query(value = "CALL create_trial_subscription(:profileId, :subscriptionId)", nativeQuery = true)
-    void createTrialSubscription(@Param("profileId") UUID profileId, @Param("subscriptionId") UUID subscriptionId);
+    @Query(value = "CALL create_trial_subscription(:profileId)", nativeQuery = true)
+    void createTrialSubscription(@Param("profileId") UUID profileId);
 
     @Transactional
     @Modifying
     @Query(value = "CALL create_subscription(:profileId, :priceId, :startDate, :endDate, :subscriptionId, :subscriptionCost)", nativeQuery = true)
     void createSubscription(@Param("profileId") UUID profileId,
                             @Param("priceId") Integer priceId,
-                            @Param("startDate") LocalDate startDate,
-                            @Param("endDate") LocalDate endDate,
-                            @Param("subscriptionId") UUID subscriptionId,
+                            @Param("startDate") Date startDate,
+                            @Param("endDate") Date endDate,
                             @Param("subscriptionCost") Double subscriptionCost);
 
     @Transactional

@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
@@ -13,9 +14,9 @@ public class Referral {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotBlank(message = "Host id is required")
+    @NotNull
     private UUID hostId;
-    @NotBlank(message = "Invited user id is required")
+    @NotNull
     private UUID invitedId;
 
     public Referral() {
