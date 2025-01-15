@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,10 +30,26 @@ public class ProfileService {
 
     public ResponseEntity<?> updatePreferences(UUID profileId, PreferencesRequest preferencesRequest) {
         try {
+            String[] classifications = preferencesRequest.getClassifications() != null
+                    ? preferencesRequest.getClassifications()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .map(Object::toString)
+                    .toArray(String[]::new)
+                    : null;
+
+            String[] genres = preferencesRequest.getGenres()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .map(genre -> String.format("{\"id\": %d, \"name\": \"%s\"}", genre.getId(), genre.getName()))  // Creating JSON format strings
+                    .toArray(String[]::new);
+
+            System.out.println("Genres: " + Arrays.toString(genres));
+
             profileRepository.updateProfilePreferences(
                     profileId,
-                    preferencesRequest.getClassifications().toArray(new String[0]),
-                    preferencesRequest.getGenres().toArray(new String[0]),
+                    classifications,
+                    genres,
                     preferencesRequest.isInterestedInFilms(),
                     preferencesRequest.isInterestedInSeries(),
                     preferencesRequest.isInterestedInFilmsWithMinimumAge()
@@ -64,7 +83,7 @@ public class ProfileService {
 
     public ResponseEntity<?> createProfile(UUID userId, String profileName, String profilePhoto, String age, String language) {
         try {
-            profileRepository.createProfile(userId, profileName, profilePhoto, age, language);
+            profileRepository.createProfile(userId, profileName, profilePhoto, age != null ? Date.valueOf(age) : null, language);
 
             return ResponseEntity.ok(userService.findUserByUserId(userId));
         } catch (Exception e) {

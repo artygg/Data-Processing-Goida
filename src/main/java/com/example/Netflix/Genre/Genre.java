@@ -23,7 +23,8 @@ public class Genre {
     @NotBlank(message = "Content is required")
     private Set<Content> contents;
 
-
+    public Genre() {
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

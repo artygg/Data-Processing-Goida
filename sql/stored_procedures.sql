@@ -54,11 +54,11 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON PROCEDURE
-    sp_admin_create_user(VARCHAR, VARCHAR, BOOLEAN),
-    sp_admin_update_user(INT, VARCHAR, VARCHAR, BOOLEAN),
-    sp_admin_delete_user(INT)
-TO app_admin;
+-- GRANT EXECUTE ON PROCEDURE
+--     sp_admin_create_user(VARCHAR, VARCHAR, BOOLEAN),
+--     sp_admin_update_user(INT, VARCHAR, VARCHAR, BOOLEAN),
+--     sp_admin_delete_user(INT)
+-- TO app_admin;
 
 CREATE OR REPLACE PROCEDURE sp_create_content (
     p_title        VARCHAR(255),
@@ -101,10 +101,10 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON PROCEDURE
-    sp_create_content(VARCHAR, VARCHAR, TEXT, VARCHAR, DOUBLE PRECISION, VARCHAR, INT, INT, INT),
-    sp_delete_content(INT)
-TO content_manager;
+-- GRANT EXECUTE ON PROCEDURE
+--     sp_create_content(VARCHAR, VARCHAR, TEXT, VARCHAR, DOUBLE PRECISION, VARCHAR, INT, INT, INT),
+--     sp_delete_content(INT)
+-- TO content_manager;
 ----------------------
 CREATE OR REPLACE PROCEDURE update_content_by_id(
     p_id BIGINT,
@@ -140,44 +140,44 @@ END IF;
 END;
 $$;
 ----------------------
-CREATE OR REPLACE PROCEDURE update_profile_preferences(
-    profile_id UUID,
-    classifications TEXT[],
-    genres TEXT[],
-    interested_in_films BOOLEAN,
-    interested_in_series BOOLEAN,
-    interested_in_films_with_min_age BOOLEAN
+CREATE OR REPLACE PROCEDURE update_user_credentials(
+    user_id UUID,
+    new_email VARCHAR,
+    new_password VARCHAR
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-profile_exists BOOLEAN;
-    converted_classifications TEXT[];
+    existing_user_id UUID;
+    existing_is_banned BOOLEAN;
 BEGIN
-SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
+    -- Fetch user data, including banned status, in one go
+    SELECT id, is_banned INTO existing_user_id, existing_is_banned
+    FROM public.users
+    WHERE id = user_id;
 
-IF NOT profile_exists THEN
-        RAISE EXCEPTION 'Profile with ID % not found', profile_id;
-END IF;
-    IF classifications IS NOT NULL AND array_length(classifications, 1) > 0 THEN
-        converted_classifications := ARRAY(
-            SELECT UPPER(classification)
-            FROM unnest(classifications) classification
-        );
-ELSE
-        converted_classifications := '{}';
-END IF;
-UPDATE public.profiles
-SET
-    preferences = jsonb_build_object(
-            'classifications', converted_classifications,
-            'genres', genres,
-            'interestedInFilms', interested_in_films,
-            'interestedInSeries', interested_in_series,
-            'interestedInFilmsWithMinAge', interested_in_films_with_min_age
-                  )
-WHERE id = profile_id;
-RAISE NOTICE 'Profile % updated successfully.', profile_id;
+    -- Handle user not found scenario
+    IF existing_user_id IS NULL THEN
+        RAISE EXCEPTION 'User with id % not found', user_id;
+    END IF;
+
+    -- Handle banned user scenario
+    IF existing_is_banned THEN
+        RAISE EXCEPTION 'User with id % is banned', user_id;
+    END IF;
+
+    -- Update user credentials if user is found and not banned
+    UPDATE public.users
+    SET
+        email = COALESCE(new_email, email),
+        password = COALESCE(new_password, password)
+    WHERE id = user_id;
+
+    -- Optionally, check the number of rows affected to handle updates
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Failed to update user with id %', user_id;
+    END IF;
+
 END;
 $$;
 ----------------------
@@ -234,38 +234,102 @@ CREATE OR REPLACE PROCEDURE update_profile(
     new_age DATE,
     new_language TEXT
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-existing_profile RECORD;
+    existing_profile RECORD;
     valid_language BOOLEAN;
 BEGIN
-SELECT * INTO existing_profile
-FROM public.profiles
-WHERE id = profile_id;
+    -- Check if the profile exists
+    SELECT * INTO existing_profile
+    FROM public.profiles
+    WHERE id = profile_id;
 
-IF NOT FOUND THEN
+    IF NOT FOUND THEN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id;
-END IF;
+    END IF;
 
+    -- Update the profile fields if new values are provided
+    UPDATE public.profiles
+    SET
+        profile_name = COALESCE(NULLIF(new_profile_name, ''), profile_name),
+        profile_photo = COALESCE(NULLIF(new_profile_photo, ''), profile_photo),
+        age = COALESCE(new_age, age),
+        language = CASE
+                       WHEN new_language IS NOT NULL AND EXISTS (
+                           SELECT 1
+                           FROM unnest(ARRAY['ENGLISH', 'RUSSIAN', 'ARABIC', 'FRENCH', 'JAPANESE']) AS lang
+                           WHERE lang = UPPER(new_language)
+                       ) THEN UPPER(new_language)
+                       ELSE language
+            END
+    WHERE id = profile_id;
+
+    RAISE NOTICE 'Profile updated successfully for ID: %', profile_id;
+END;
+$$;
+
+----------------------
+CREATE OR REPLACE PROCEDURE create_profile(
+    user_id_field UUID,
+    new_profile_name TEXT,
+    new_profile_photo TEXT,
+    new_age DATE,
+    new_language TEXT
+)
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    existing_profile RECORD;
+    valid_language BOOLEAN;
+    is_child BOOLEAN;
+    calculated_age INT;
+BEGIN
+    -- Check if the profile exists
+    SELECT * INTO existing_profile
+    FROM public.profiles
+    WHERE user_id = user_id_field;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Profile with user ID % not found', user_id_field;
+    END IF;
+
+    -- Handle age and calculate is_child
+    IF new_age IS NULL THEN
+        UPDATE public.profiles
+        SET age = null
+        WHERE user_id = user_id_field;
+    ELSE
+        -- Calculate age in years
+        calculated_age := DATE_PART('year', AGE(new_age));
+        IF calculated_age < 18 AND calculated_age >= 0 THEN
+            is_child := TRUE;
+        ELSE
+            is_child := FALSE;
+        END IF;
+
+        -- Update age and is_child
+        UPDATE public.profiles
+        SET age = calculated_age,
+            is_child = is_child
+        WHERE user_id = user_id_field;
+    END IF;
+
+    -- Update profile name if provided
     IF new_profile_name IS NOT NULL AND new_profile_name <> '' THEN
-UPDATE public.profiles
-SET profile_name = new_profile_name
-WHERE id = profile_id;
-END IF;
+        UPDATE public.profiles
+        SET profile_name = new_profile_name
+        WHERE user_id = user_id_field;
+    END IF;
 
+    -- Update profile photo if provided
     IF new_profile_photo IS NOT NULL AND new_profile_photo <> '' THEN
-UPDATE public.profiles
-SET profile_photo = new_profile_photo
-WHERE id = profile_id;
-END IF;
+        UPDATE public.profiles
+        SET profile_photo = new_profile_photo
+        WHERE user_id = user_id_field;
+    END IF;
 
-    IF new_age IS NOT NULL THEN
-UPDATE public.profiles
-SET age = new_age
-WHERE id = profile_id;
-END IF;
-
+    -- Validate and update language
     valid_language := EXISTS (
         SELECT 1
         FROM unnest(ARRAY['ENGLISH', 'RUSSIAN', 'ARABIC', 'FRENCH', 'JAPANESE']) AS lang
@@ -275,69 +339,14 @@ END IF;
     IF new_language IS NOT NULL THEN
         IF NOT valid_language THEN
             RAISE EXCEPTION 'Invalid language value: %', new_language;
-ELSE
-UPDATE public.profiles
-SET language = UPPER(new_language)
-WHERE id = profile_id;
-END IF;
-END IF;
+        ELSE
+            UPDATE public.profiles
+            SET language = UPPER(new_language)
+            WHERE user_id = user_id_field;
+        END IF;
+    END IF;
 
-    RAISE NOTICE 'Profile updated successfully for ID: %', profile_id;
-END;
-$$;
-----------------------
-CREATE OR REPLACE PROCEDURE create_profile(
-    user_id UUID,
-    new_profile_name TEXT,
-    new_profile_photo TEXT,
-    new_age DATE,
-    new_language TEXT
-)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-existing_user RECORD;
-    profile_count INT;
-    valid_language BOOLEAN;
-    new_profile RECORD;
-BEGIN
-SELECT * INTO existing_user
-FROM public.users
-WHERE id = user_id;
-
-IF NOT FOUND THEN
-        RAISE EXCEPTION 'User with ID % not found', user_id;
-END IF;
-
-SELECT COUNT(*) INTO profile_count
-FROM public.profiles
-WHERE user_id = user_id;
-
-IF profile_count >= 4 THEN
-        RAISE EXCEPTION 'User has reached the profile limit of 4';
-END IF;
-
-INSERT INTO public.profiles (profile_name, profile_photo, user_id, age, language)
-VALUES (
-           new_profile_name,
-           new_profile_photo,
-           user_id,
-           new_age,
-           UPPER(new_language)
-       )
-    RETURNING * INTO new_profile;
-
-valid_language := EXISTS (
-        SELECT 1
-        FROM unnest(ARRAY['ENGLISH', 'RUSSIAN', 'ARABIC', 'FRENCH', 'JAPANESE']) AS lang
-        WHERE lang = UPPER(new_language)
-    );
-
-    IF new_language IS NOT NULL AND NOT valid_language THEN
-        RAISE EXCEPTION 'Invalid language value: %', new_language;
-END IF;
-
-    RAISE NOTICE 'Profile created successfully for User ID: %, Profile ID: %', user_id, new_profile.id;
+    RAISE NOTICE 'Profile updated successfully for User ID: %', user_id_field;
 END;
 $$;
 ----------------------
@@ -389,20 +398,23 @@ CREATE OR REPLACE PROCEDURE get_resolution_by_id(
     OUT resolution_id INTEGER,
     OUT name VARCHAR
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS
 $$
 BEGIN
-SELECT resolution_id, name
-INTO resolution_id, name
-FROM public.resolution
-WHERE resolution_id = resolution_id_param;
+    -- Explicitly qualify the table column with the table name
+    SELECT r.resolution_id, r.name
+    INTO resolution_id, name
+    FROM public.resolution r
+    WHERE r.resolution_id = resolution_id_param;
 
-IF NOT FOUND THEN
+    -- Check if no rows were found
+    IF NOT FOUND THEN
         RAISE EXCEPTION 'Resolution with id % not found', resolution_id_param;
-END IF;
+    END IF;
 END;
 $$;
+
 ----------------------
 CREATE OR REPLACE PROCEDURE create_trial_subscription(profile_id UUID, OUT subscription_id UUID)
 LANGUAGE plpgsql
@@ -526,11 +538,11 @@ FROM public.users
 WHERE id = user_id;
 
 IF existing_user_id IS NULL THEN
-        RAISE EXCEPTION 'User not found';
+        RAISE EXCEPTION 'User with id % not found', user_id;
 END IF;
 
     IF existing_is_banned THEN
-        RAISE EXCEPTION 'User is banned';
+        RAISE EXCEPTION 'User with id % is banned', user_id;
 END IF;
 
 UPDATE public.users
@@ -538,6 +550,10 @@ SET
     email = COALESCE(new_email, email),
     password = COALESCE(new_password, password)
 WHERE id = user_id;
+
+IF NOT FOUND THEN
+        RAISE EXCEPTION 'Failed to update user with id %', user_id;
+END IF;
 
 END;
 $$;
@@ -567,8 +583,8 @@ IF host_user_has_used_referral THEN
         RAISE EXCEPTION 'Referral link had been used';
 END IF;
 
-INSERT INTO public.referrals (host_user_id, invited_user_id)
-VALUES (host_user_id, invited_user_id);
+INSERT INTO public.referral (id, host_id, invited_id)
+VALUES (nextval('public.referral_seq'), host_user_id, invited_user_id);
 
 UPDATE public.users
 SET has_used_referral_link = TRUE
@@ -577,3 +593,77 @@ WHERE id = host_user_id;
 END;
 $$;
 ----------------------
+CREATE OR REPLACE PROCEDURE update_profile_preferences(
+    profile_id_field UUID,
+    classifications TEXT[],
+    genres TEXT[],  -- Assuming genres are passed as TEXT[]
+    interested_in_films BOOLEAN,
+    interested_in_series BOOLEAN,
+    interested_in_films_with_min_age BOOLEAN
+)
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    profile_exists BOOLEAN;
+    converted_classifications TEXT[];
+    genre JSONB;  -- Declare genre as JSONB to handle it as JSONB object
+    preference_id INT;
+BEGIN
+    -- Check if the profile exists
+    SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id_field) INTO profile_exists;
+
+    IF NOT profile_exists THEN
+        RAISE EXCEPTION 'Profile with ID % not found', profile_id_field;
+    END IF;
+
+    -- Convert classifications to uppercase if present
+    IF classifications IS NOT NULL AND array_length(classifications, 1) > 0 THEN
+        converted_classifications := ARRAY(
+                SELECT UPPER(classification)
+                FROM unnest(classifications) classification
+                                     );
+    ELSE
+        converted_classifications := NULL;
+    END IF;
+
+    -- Update preferences for the profile
+    UPDATE public.preferences
+    SET
+        is_interested_in_films = interested_in_films,
+        is_interested_in_films_with_minimum_age = interested_in_films_with_min_age,
+        is_interested_in_series = interested_in_series
+    WHERE profile_id = profile_id_field;
+
+    -- Get preference ID
+    SELECT id
+    INTO preference_id
+    FROM public.preferences
+    WHERE profile_id = profile_id_field;
+
+    -- Delete old genres for the profile
+    DELETE FROM public.preferences_genres WHERE preferences_id = preference_id;
+
+    -- Insert new genres
+    IF genres IS NOT NULL THEN
+        FOREACH genre IN ARRAY genres
+            LOOP
+                -- Cast each text genre to JSONB for extracting 'id' and 'name'
+                genre := genre::JSONB;  -- Convert genre from text to JSONB
+                -- Extract 'id' and 'name' from the genre JSONB object
+                INSERT INTO public.preferences_genres (preferences_id, genres, genres_id)
+                VALUES (
+                           preference_id,          -- Use the preference_id for the preferences_id
+                           genre->>'name',         -- Extract genre 'name' as text
+                           (genre->>'id')::bigint     -- Extract genre 'id' and cast it to INT
+                       );
+            END LOOP;
+    END IF;
+
+    -- Raise notice
+    RAISE NOTICE 'Profile % updated successfully.', profile_id_field;
+END;
+$$;
+
+
+
+

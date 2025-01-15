@@ -1,10 +1,13 @@
 package com.example.Netflix.Content;
 
+import com.example.Netflix.Deserializer.StatusDeserializer;
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.enums.ContentType;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,11 +28,12 @@ public class Content {
     private String description;
     @NotBlank(message = "Video link is required")
     private String videoLink;
-    @NotBlank(message = "Duration is required")
+    @NotNull
     private Double duration;
 
+    @JsonDeserialize(using = StatusDeserializer.class)
     @Enumerated(EnumType.STRING)
-    @NotBlank(message = "Content type is required")
+    @NotNull
     private ContentType type;
 
     private Integer season;
@@ -55,6 +59,34 @@ public class Content {
 
     public Content()
     {
+    }
+
+    public Content(String title,
+                   String poster,
+                   String description,
+                   String videoLink,
+                   Double duration,
+                   ContentType type,
+                   Integer season,
+                   Integer episodeNumber,
+                   Integer seriesId,
+                   LocalDateTime updatedAt,
+                   LocalDateTime createdAt,
+                   List<Resolution> resolutions,
+                   Set<Genre> genres) {
+        this.title = title;
+        this.poster = poster;
+        this.description = description;
+        this.videoLink = videoLink;
+        this.duration = duration;
+        this.type = type;
+        this.season = season;
+        this.episodeNumber = episodeNumber;
+        this.seriesId = seriesId;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
+        this.resolutions = resolutions;
+        this.genres = genres;
     }
 
     public Long getId()

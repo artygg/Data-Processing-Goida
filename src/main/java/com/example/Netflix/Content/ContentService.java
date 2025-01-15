@@ -76,13 +76,14 @@ public class ContentService {
 
     public ResponseEntity<?> updateContent(Long id, Content updatedContent) throws ResourceNotFoundException {
         try {
+            System.out.println("Type: " + updatedContent.getType());
             contentRepository.updateContentById(
                     id,
                     updatedContent.getTitle(),
                     updatedContent.getDescription(),
                     updatedContent.getVideoLink(),
                     updatedContent.getDuration(),
-                    updatedContent.getType().toString(),
+                    updatedContent.getType() != null ? updatedContent.getType().toString().toUpperCase() : null,
                     updatedContent.getSeason(),
                     updatedContent.getEpisodeNumber(),
                     updatedContent.getSeriesId()

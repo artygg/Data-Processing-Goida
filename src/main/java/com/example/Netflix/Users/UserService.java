@@ -38,16 +38,8 @@ public class UserService {
             userRepository.updateUserCredentials(id, userRequestBody.getEmail(), userRequestBody.getPassword());
             return ResponseEntity.ok(userRequestBody);
         } catch (Exception e) {
-            if (e.getMessage().contains("User not found")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ResponseMessage("Requested user was not found"));
-            } else if (e.getMessage().contains("User is banned")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new ResponseMessage("User is banned"));
-            } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseMessage("An error occurred"));
-            }
+                        .body(new ResponseMessage("An error occurred: " + e.getMessage()));
         }
     }
 

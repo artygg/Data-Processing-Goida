@@ -1,5 +1,6 @@
 package com.example.Netflix.GlobalExceptionHandlers;
 
+import com.example.Netflix.Exceptions.InvalidContentType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,5 +19,12 @@ public class ValidationExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .collect(Collectors.toList());
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidContentType.class)
+    public ResponseEntity<String> handleInvalidEnumValueException(InvalidContentType ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 }
