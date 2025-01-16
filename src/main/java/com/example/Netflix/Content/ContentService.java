@@ -35,7 +35,7 @@ public class ContentService {
 
     public Content getContentById(Long id) throws ResourceNotFoundException {
         return contentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found"));
     }
 
     public List<Content> getAllFilms() {
@@ -74,7 +74,8 @@ public class ContentService {
         return contentRepository.save(content);
     }
 
-    public ResponseEntity<?> updateContent(Long id, Content updatedContent) throws ResourceNotFoundException {
+    public ResponseEntity<?> updateContent(Long id, Content updatedContent)
+    {
         try {
             System.out.println("Type: " + updatedContent.getType());
             contentRepository.updateContentById(
@@ -113,7 +114,7 @@ public class ContentService {
     {
         Content content = getContentById(contentId);
         Genre genre = genreRepository.findById(genreId)
-                .orElseThrow(() -> new ResourceNotFoundException("Genre not found with ID: " + genreId));
+                .orElseThrow(() -> new ResourceNotFoundException("Genre not found"));
         content.getGenres().add(genre);
         contentRepository.save(content);
     }

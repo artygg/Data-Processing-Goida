@@ -1,11 +1,15 @@
 package com.example.Netflix.Content;
 
 import com.example.Netflix.Exceptions.ResourceNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,25 +60,39 @@ public class ContentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createContent(@RequestBody Content content) {
+    public ResponseEntity<?> createContent(@Valid @RequestBody Content content) {
         try {
-            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal()).getUsername();
-            return ResponseEntity.ok(contentService.createContent(content));
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
+            }
+
+            Content savedContent = contentService.createContent(content);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedContent);
+
+        } catch (ConstraintViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation error: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating content: " + e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContent(@PathVariable Long id, @RequestBody Content updatedContent)
-            throws ResourceNotFoundException {
+    public ResponseEntity<?> updateContent(@PathVariable Long id, @Valid @RequestBody Content updatedContent)
+    {
         try {
-            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal()).getUsername();
-            return ResponseEntity.ok(contentService.updateContent(id, updatedContent));
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
+            }
+
+            ResponseEntity<?> responseEntity = contentService.updateContent(id, updatedContent);
+
+            return responseEntity;
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating content: " + e.getMessage());
         }
     }
 

@@ -4,6 +4,7 @@ import com.example.Netflix.Deserializer.StatusDeserializer;
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.enums.ContentType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +16,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "contents")
-public class Content {
+public class Content
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "content_id")
@@ -42,51 +44,34 @@ public class Content {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     @ManyToMany
-    @JoinTable(
-            name = "quality_ranges",
-            joinColumns = @JoinColumn(name = "content_id"),
-            inverseJoinColumns = @JoinColumn(name = "resolution_id")
-    )
+    @JoinTable(name = "quality_ranges", joinColumns = @JoinColumn(name = "content_id"), inverseJoinColumns = @JoinColumn(name = "resolution_id"))
+    @JsonManagedReference
     private List<Resolution> resolutions;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "genre_contents",
-            joinColumns = @JoinColumn(name = "content_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
+    @JoinTable(name = "genre_contents", joinColumns = @JoinColumn(name = "content_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @JsonManagedReference
     private Set<Genre> genres;
 
     public Content()
     {
     }
 
-    public Content(String title,
-                   String poster,
-                   String description,
-                   String videoLink,
-                   Double duration,
-                   ContentType type,
-                   Integer season,
-                   Integer episodeNumber,
-                   Integer seriesId,
-                   LocalDateTime updatedAt,
-                   LocalDateTime createdAt,
-                   List<Resolution> resolutions,
-                   Set<Genre> genres) {
-        this.title = title;
-        this.poster = poster;
-        this.description = description;
-        this.videoLink = videoLink;
-        this.duration = duration;
-        this.type = type;
-        this.season = season;
-        this.episodeNumber = episodeNumber;
-        this.seriesId = seriesId;
-        this.updatedAt = updatedAt;
-        this.createdAt = createdAt;
-        this.resolutions = resolutions;
-        this.genres = genres;
+    public Content(String title, String poster, String description, String videoLink, Double duration, ContentType type, Integer season, Integer episodeNumber, Integer seriesId, LocalDateTime updatedAt, LocalDateTime createdAt, List<Resolution> resolutions, Set<Genre> genres)
+    {
+        this.setTitle(title);
+        this.setPoster(poster);
+        this.setDescription(description);
+        this.setVideoLink(videoLink);
+        this.setDuration(duration);
+        this.setType(type);
+        this.setSeason(season);
+        this.setEpisodeNumber(episodeNumber);
+        this.setSeriesId(seriesId);
+        this.setUpdatedAt(updatedAt);
+        this.setCreatedAt(createdAt);
+        this.setResolutions(resolutions);
+        this.setGenres(genres);
     }
 
     public Long getId()
@@ -96,6 +81,10 @@ public class Content {
 
     public void setId(Long id)
     {
+        if (id == null || id <= 0)
+        {
+            throw new IllegalArgumentException("ID must be a positive number.");
+        }
         this.id = id;
     }
 
@@ -106,6 +95,10 @@ public class Content {
 
     public void setTitle(String title)
     {
+        if (title == null || title.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Title is required and cannot be empty.");
+        }
         this.title = title;
     }
 
@@ -116,6 +109,10 @@ public class Content {
 
     public void setPoster(String poster)
     {
+        if (poster == null || poster.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Poster is required and cannot be empty.");
+        }
         this.poster = poster;
     }
 
@@ -126,6 +123,10 @@ public class Content {
 
     public void setDescription(String description)
     {
+        if (description == null || description.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Description is required and cannot be empty.");
+        }
         this.description = description;
     }
 
@@ -136,6 +137,10 @@ public class Content {
 
     public void setVideoLink(String videoLink)
     {
+        if (videoLink == null || videoLink.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Video link is required and cannot be empty.");
+        }
         this.videoLink = videoLink;
     }
 
@@ -146,6 +151,10 @@ public class Content {
 
     public void setDuration(Double duration)
     {
+        if (duration == null || duration <= 0)
+        {
+            throw new IllegalArgumentException("Duration must be a positive number.");
+        }
         this.duration = duration;
     }
 
@@ -156,6 +165,10 @@ public class Content {
 
     public void setType(ContentType type)
     {
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Content type is required.");
+        }
         this.type = type;
     }
 
@@ -166,6 +179,10 @@ public class Content {
 
     public void setSeason(Integer season)
     {
+        if (season != null && season < 1)
+        {
+            throw new IllegalArgumentException("Season number must be at least 1.");
+        }
         this.season = season;
     }
 
@@ -176,6 +193,10 @@ public class Content {
 
     public void setEpisodeNumber(Integer episodeNumber)
     {
+        if (episodeNumber != null && episodeNumber < 1)
+        {
+            throw new IllegalArgumentException("Episode number must be at least 1.");
+        }
         this.episodeNumber = episodeNumber;
     }
 
@@ -186,6 +207,10 @@ public class Content {
 
     public void setSeriesId(Integer seriesId)
     {
+        if (seriesId != null && seriesId < 1)
+        {
+            throw new IllegalArgumentException("Series ID must be a positive number.");
+        }
         this.seriesId = seriesId;
     }
 
@@ -196,6 +221,10 @@ public class Content {
 
     public void setCreatedAt(LocalDateTime createdAt)
     {
+        if (createdAt == null)
+        {
+            throw new IllegalArgumentException("Created timestamp cannot be null.");
+        }
         this.createdAt = createdAt;
     }
 
@@ -206,25 +235,26 @@ public class Content {
 
     public void setUpdatedAt(LocalDateTime updatedAt)
     {
-        this.updatedAt = updatedAt;
-    }
-
-    public Set<Genre> getGenres()
-    {
-        return genres;
-    }
-
-    public void setGenres(Set<Genre> genres)
-    {
-        this.genres = genres;
+        if (updatedAt == null)
+        {
+            throw new IllegalArgumentException("Updated timestamp cannot be null.");
+        }
     }
 
     public List<Resolution> getResolutions() {
-        return this.resolutions;
+        return resolutions;
     }
 
     public void setResolutions(List<Resolution> resolutions) {
         this.resolutions = resolutions;
+    }
+
+    public Set<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(Set<Genre> genres) {
+        this.genres = genres;
     }
 }
 

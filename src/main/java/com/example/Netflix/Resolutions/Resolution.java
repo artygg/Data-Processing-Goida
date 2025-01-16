@@ -1,6 +1,8 @@
 package com.example.Netflix.Resolutions;
 
 import com.example.Netflix.Content.Content;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +24,7 @@ public class Resolution {
             inverseJoinColumns = @JoinColumn(name = "content_id"),
             joinColumns = @JoinColumn(name = "resolution_id")
     )
+    @JsonBackReference
     private List<Content> contents;
 
     public Resolution() {
