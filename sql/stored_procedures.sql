@@ -182,50 +182,38 @@ END;
 $$;
 ----------------------
 CREATE OR REPLACE PROCEDURE remove_from_watch_later(
-    profile_id UUID,
-    content_id BIGINT
+    profile_id_in UUID,
+    content_id_in BIGINT
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-profile_exists BOOLEAN;
+    profile_exists BOOLEAN;
     content_exists BOOLEAN;
-    watch_later JSONB;
-    updated_watch_later JSONB;
 BEGIN
-SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
+    -- Check if profile exists
+    SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id_in) INTO profile_exists;
 
-IF NOT profile_exists THEN
-        RAISE EXCEPTION 'Profile with ID % not found', profile_id;
-END IF;
+    IF NOT profile_exists THEN
+        RAISE EXCEPTION 'Profile with ID % not found', profile_id_in;
+    END IF;
 
-SELECT EXISTS (SELECT 1 FROM public.contents WHERE id = content_id) INTO content_exists;
+    -- Check if content exists
+    SELECT EXISTS (SELECT 1 FROM public.contents WHERE id = content_id_in) INTO content_exists;
 
-IF NOT content_exists THEN
-        RAISE EXCEPTION 'Content with ID % not found', content_id;
-END IF;
+    IF NOT content_exists THEN
+        RAISE EXCEPTION 'Content with ID % not found', content_id_in;
+    END IF;
 
-SELECT watch_later INTO watch_later
-FROM public.profiles
-WHERE id = profile_id;
+    -- Delete the entry from profiles_watch_later table
+    DELETE FROM public.profiles_watch_later
+    WHERE profile_id = profile_id_in AND profiles_watch_later.watch_later_content_id = content_id_in;
 
-IF watch_later IS NOT NULL THEN
-        updated_watch_later := (
-            SELECT jsonb_agg(elem)
-            FROM jsonb_array_elements(watch_later) elem
-            WHERE (elem->>'id')::BIGINT != content_id
-        );
-ELSE
-        updated_watch_later := '[]'::JSONB;
-END IF;
-
-UPDATE public.profiles
-SET watch_later = updated_watch_later
-WHERE id = profile_id;
-
-RAISE NOTICE 'Successfully removed content with ID % from watch later list.', content_id;
+    -- Optionally, you can return a success message
+    RAISE NOTICE 'Successfully removed content with ID % from watch later list.', content_id_in;
 END;
 $$;
+
 ----------------------
 CREATE OR REPLACE PROCEDURE update_profile(
     profile_id UUID,
@@ -446,8 +434,7 @@ CREATE OR REPLACE PROCEDURE create_subscription(
     price_id INTEGER,
     start_date_insert DATE,
     end_date_insert DATE,
-    subscription_cost DOUBLE PRECISION,
-    OUT new_subscription_id UUID
+    subscription_cost DOUBLE PRECISION
 )
     LANGUAGE plpgsql
 AS $$
@@ -458,25 +445,29 @@ BEGIN
     -- Profile check
     SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
     IF NOT profile_exists THEN
-        RAISE EXCEPTION 'Profile not found';
+        RAISE EXCEPTION 'Profile with ID % not found', profile_id;
     END IF;
 
     -- Price validation
     SELECT price INTO price_amount FROM public.price WHERE id = price_id;
-    IF price_amount IS NULL THEN
-        RAISE EXCEPTION 'Price not found for the given price_id';
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Price not found for the given price_id: %', price_id;
+    END IF;
+
+    -- Date validation
+    IF end_date_insert <= start_date_insert THEN
+        RAISE EXCEPTION 'End date must be after the start date';
     END IF;
 
     -- Insert subscription
     INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-    VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id)
-    RETURNING id INTO new_subscription_id;
+    VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id);
+
+    -- Output cost
+    subscription_cost := price_amount;
 
     -- Output notice
-    RAISE NOTICE 'Subscription created successfully for Profile ID: %', profile_id;
-
-    -- Set subscription cost as output
-    subscription_cost := price_amount;
+    RAISE NOTICE 'Subscription created successfully for Profile ID: %, Cost: %', profile_id, subscription_cost;
 END;
 $$;
 

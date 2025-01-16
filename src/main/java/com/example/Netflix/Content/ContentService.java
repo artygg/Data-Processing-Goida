@@ -144,5 +144,9 @@ public class ContentService {
         content.getResolutions().remove(resolution);
         contentRepository.save(content);
     }
+
+    public void saveContent(Content content) {
+        contentRepository.save(content);
+    }
 }
 

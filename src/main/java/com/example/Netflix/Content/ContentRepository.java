@@ -40,4 +40,5 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             @org.springframework.data.repository.query.Param("seriesId") Integer seriesId
     );
 
+    boolean existsById(Long id);
 }

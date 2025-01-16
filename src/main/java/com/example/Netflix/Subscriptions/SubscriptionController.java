@@ -44,7 +44,7 @@ public class SubscriptionController {
             end = subscriptionBody.getEndDate();
         }
         try {
-            Subscription subscription = subscriptionService.createSubscription(subscriptionBody.getProfile(), subscriptionBody.getPriceId(), start, end);
+            Subscription subscription = subscriptionService.createSubscription2(subscriptionBody.getProfile(), subscriptionBody.getPriceId(), start, end);
             return ResponseEntity.ok(subscription);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

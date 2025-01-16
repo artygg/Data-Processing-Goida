@@ -1,6 +1,7 @@
 package com.example.Netflix.Profiles;
 
 import com.example.Netflix.Content.Content;
+import com.example.Netflix.Content.ContentRepository;
 import com.example.Netflix.Content.ContentService;
 import com.example.Netflix.Exceptions.ProfileLimitReached;
 import com.example.Netflix.Genre.Genre;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Transient;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +30,10 @@ import java.util.*;
 public class ProfileController {
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private ContentService contentService;
+    @Autowired
+    private ContentRepository contentRepository;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -112,11 +118,20 @@ public class ProfileController {
                                                    @RequestBody @Valid Content content) {
         Optional<Profile> optionalProfile = profileService.findProfileById(id);
 
-        if (optionalProfile.isPresent()) {
+
+        try {if (optionalProfile.isPresent()) {
             Profile profile = optionalProfile.get();
             profile.addWatchLater(content);
 
+            if (content.getId() == null || !contentRepository.existsById(content.getId())) {
+                contentService.saveContent(content);
+            }
+
+            profileService.saveProfile(profile);
+
             return ResponseEntity.ok("Successfully added to watch later list");
+        }} catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile was not found");

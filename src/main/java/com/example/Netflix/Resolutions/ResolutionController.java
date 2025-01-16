@@ -22,7 +22,7 @@ public class ResolutionController {
     public ResponseEntity<?> createResolution(@RequestBody @Valid Resolution resolution) {
         try {
             ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-
+            System.out.println("Content:  " + resolution.getContents());
             resolutionService.saveResolution(resolution);
             return ResponseEntity.ok("Resolution created successfully: " + resolution);
         } catch (Exception e) {
