@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class ReferralService {
         }
     }
 
-    public Referral getReferralByInvitedId(UUID invitedId) {
+    public List<Referral> getReferralByInvitedId(UUID invitedId) {
         return referralRepository.getReferralByInvitedId(invitedId);
     }
 

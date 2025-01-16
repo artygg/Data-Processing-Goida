@@ -3,6 +3,7 @@ package com.example.Netflix.WatchHistory;
 import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
@@ -14,28 +15,27 @@ public class WatchHistory {
     private Long id;
 
     @Column(name = "profile_id")
-    @NotBlank(message = "Profile id required")
+    @NotNull(message = "Profile id required")
     private UUID profileId;
 
     @Column(name = "content_id")
-    @NotBlank(message = "Content is required")
+    @NotNull(message = "Content is required")
     private Long contentId;
 
     @Column(name = "stopped_at")
-    @NotBlank(message = "Time stamp is required")
+    @NotNull(message = "Time stamp is required")
     private Double stoppedAt;
 
     @Column(name = "progress")
-    @NotBlank(message = "Progress required")
+    @NotNull(message = "Progress required")
     private Double progress;
 
     @Column(name = "watching_times")
-    @NotBlank(message = "Watching times required")
+    @NotNull(message = "Watching times required")
     private Integer watchingTimes;
 
     @ManyToOne
     @JoinColumn(name = "content_id", insertable = false, updatable = false)
-    @NotBlank(message = "Content id required")
     private Content content;
 
     public WatchHistory()

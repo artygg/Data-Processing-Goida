@@ -112,11 +112,15 @@ public class ProfileController {
                                                    @RequestBody @Valid Content content) {
         Optional<Profile> optionalProfile = profileService.findProfileById(id);
 
-        if (optionalProfile.isPresent()) {
+        try {if (optionalProfile.isPresent()) {
             Profile profile = optionalProfile.get();
             profile.addWatchLater(content);
 
+            profileService.saveProfile(profile);
+
             return ResponseEntity.ok("Successfully added to watch later list");
+        }} catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile was not found");

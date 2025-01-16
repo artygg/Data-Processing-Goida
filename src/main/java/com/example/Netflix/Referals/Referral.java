@@ -1,9 +1,6 @@
 package com.example.Netflix.Referals;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -15,8 +12,10 @@ public class Referral {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotNull
+    @Column(name = "host_id")
     private UUID hostId;
     @NotNull
+    @Column(name = "invited_id")
     private UUID invitedId;
 
     public Referral() {

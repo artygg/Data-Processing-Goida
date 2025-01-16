@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,7 +23,8 @@ public interface ReferralRepository extends JpaRepository<Referral, Long> {
             @Param("invitedId") UUID invitedId
     );
 
-    @Query(value = "SELECT * \n" +
-            "FROM get_referral_by_invited_id('931b01d7-c961-4b9d-867d-72128d54064b') AS t(referral_id_out, host_id_out, invited_id_out);", nativeQuery = true)
-    Referral getReferralByInvitedId(@Param("invitedId") UUID invitedId);
+    @Query(value = "SELECT referral_id_out AS id, host_id_out AS host_id, invited_id_out AS invited_id " +
+            "FROM get_referral_by_invited_id(:invitedId);",
+            nativeQuery = true)
+    List<Referral> getReferralByInvitedId(@Param("invitedId") UUID invitedId);
 }

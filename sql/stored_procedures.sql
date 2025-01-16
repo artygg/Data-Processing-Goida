@@ -446,8 +446,8 @@ CREATE OR REPLACE PROCEDURE create_subscription(
     price_id INTEGER,
     start_date_insert DATE,
     end_date_insert DATE,
-    subscription_cost DOUBLE PRECISION,
-    OUT new_subscription_id UUID
+    subscription_cost DOUBLE PRECISION
+
 )
     LANGUAGE plpgsql
 AS $$
@@ -469,8 +469,8 @@ BEGIN
 
     -- Insert subscription
     INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-    VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id)
-    RETURNING id INTO new_subscription_id;
+    VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id);
+
 
     -- Output notice
     RAISE NOTICE 'Subscription created successfully for Profile ID: %', profile_id;

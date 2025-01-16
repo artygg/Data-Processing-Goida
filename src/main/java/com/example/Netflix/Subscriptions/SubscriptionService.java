@@ -25,7 +25,7 @@ public class SubscriptionService {
     }
 
     public Subscription createSubscription(UUID profileId, Integer priceId, Date startDate, Date endDate) {
-        UUID subscriptionId = null;
+
         Double subscriptionCost = 0.0;
 
         subscriptionRepository.createSubscription(profileId, priceId, startDate, endDate, subscriptionCost);

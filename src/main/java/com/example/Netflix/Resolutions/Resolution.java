@@ -3,6 +3,7 @@ package com.example.Netflix.Resolutions;
 import com.example.Netflix.Content.Content;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -12,10 +13,15 @@ public class Resolution {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "resolution_id")
     private Integer id;
-    @NotBlank(message = "Name is required")
+    @NotNull(message = "Name is required")
     private String name;
-    @NotBlank(message = "Content is required")
+    @NotNull(message = "Content is required")
     @ManyToMany
+    @JoinTable(
+            name = "quality_ranges",
+            inverseJoinColumns = @JoinColumn(name = "content_id"),
+            joinColumns = @JoinColumn(name = "resolution_id")
+    )
     private List<Content> contents;
 
     public Resolution() {

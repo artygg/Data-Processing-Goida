@@ -24,12 +24,15 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
 
     @Transactional
     @Modifying
-    @Query(value = "CALL create_subscription(:profileId, :priceId, :startDate, :endDate, :subscriptionId, :subscriptionCost)", nativeQuery = true)
-    void createSubscription(@Param("profileId") UUID profileId,
-                            @Param("priceId") Integer priceId,
-                            @Param("startDate") Date startDate,
-                            @Param("endDate") Date endDate,
-                            @Param("subscriptionCost") Double subscriptionCost);
+    @Query(value = "CALL create_subscription(:profileId, :priceId, CAST(:startDate AS DATE), CAST(:endDate AS DATE), :subscriptionCost)", nativeQuery = true)
+    void createSubscription(
+            @Param("profileId") UUID profileId,
+            @Param("priceId") Integer priceId,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("subscriptionCost") Double subscriptionCost
+    );
+
 
     @Transactional
     @Modifying
