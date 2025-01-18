@@ -1,64 +1,10 @@
 REVOKE INSERT, UPDATE, DELETE ON TABLE Users, profiles, Subscriptions, contents FROM PUBLIC;
 
--- CREATE OR REPLACE PROCEDURE sp_admin_create_user (
---     p_email        VARCHAR(255),
---     p_password     VARCHAR(255),
---     p_has_referral BOOLEAN DEFAULT FALSE
--- )
---     LANGUAGE plpgsql
---     SECURITY DEFINER
--- AS $$
--- BEGIN
---     INSERT INTO Users (email, password, has_used_referral_link)
---     VALUES (p_email, p_password, p_has_referral);
---
---     RAISE NOTICE 'New user created with email: %', p_email;
--- END;
--- $$;
-
--- CREATE OR REPLACE PROCEDURE sp_admin_update_user (
---     p_user_id      INT,
---     p_email        VARCHAR(255),
---     p_password     VARCHAR(255),
---     p_has_referral BOOLEAN
--- )
---     LANGUAGE plpgsql
---     SECURITY DEFINER
--- AS $$
--- BEGIN
---     UPDATE Users
---     SET email = p_email,
---         password = p_password,
---         has_used_referral_link = p_has_referral
---     WHERE id = p_user_id;
---
---     IF NOT FOUND THEN
---         RAISE EXCEPTION 'User with id % not found', p_user_id;
---     END IF;
--- END;
--- $$;
-
--- CREATE OR REPLACE PROCEDURE sp_admin_delete_user (
---     p_user_id INT
--- )
---     LANGUAGE plpgsql
---     SECURITY DEFINER
--- AS $$
--- BEGIN
---     DELETE FROM Users
---     WHERE id = p_user_id;
---
---     IF NOT FOUND THEN
---         RAISE EXCEPTION 'User with id % not found', p_user_id;
---     END IF;
--- END;
--- $$;
-
--- GRANT EXECUTE ON PROCEDURE
---     sp_admin_create_user(VARCHAR, VARCHAR, BOOLEAN),
---     sp_admin_update_user(INT, VARCHAR, VARCHAR, BOOLEAN),
---     sp_admin_delete_user(INT)
--- TO app_admin;
+GRANT EXECUTE ON PROCEDURE
+    sp_admin_create_user(VARCHAR, VARCHAR, BOOLEAN),
+    sp_admin_update_user(INT, VARCHAR, VARCHAR, BOOLEAN),
+    sp_admin_delete_user(INT)
+TO app_admin;
 
 CREATE OR REPLACE PROCEDURE sp_create_content (
     p_title        VARCHAR(255),
