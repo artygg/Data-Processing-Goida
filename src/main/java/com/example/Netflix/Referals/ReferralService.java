@@ -1,10 +1,12 @@
 package com.example.Netflix.Referals;
 
+import com.example.Netflix.Generalization.BaseService;
 import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.Users.User;
 import com.example.Netflix.Users.UserRepository;
 import com.example.Netflix.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ReferralService {
+public class ReferralService extends BaseService<Referral, Long> {
     @Autowired
     private ReferralRepository referralRepository;
     @Autowired
@@ -22,14 +24,9 @@ public class ReferralService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<?> saveReferral(UUID hostId, UUID invitedId) {
-        try {
-            referralRepository.saveReferral(hostId, invitedId);
-
-            return ResponseEntity.ok("Referral created successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    @Override
+    protected JpaRepository<Referral, Long> getRepository() {
+        return referralRepository;
     }
 
     public List<Referral> getReferralByInvitedId(UUID invitedId) {

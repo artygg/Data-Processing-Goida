@@ -1,12 +1,14 @@
 package com.example.Netflix.Content;
 
 import com.example.Netflix.Exceptions.ResourceNotFoundException;
+import com.example.Netflix.Generalization.BaseService;
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Genre.GenreRepository;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.Resolutions.ResolutionRepository;
 import com.example.Netflix.enums.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ContentService {
+public class ContentService extends BaseService<Content, Long> {
     private final ContentRepository contentRepository;
     private final GenreRepository genreRepository;
     private final ResolutionRepository resolutionRepository;
@@ -29,8 +31,9 @@ public class ContentService {
         this.resolutionRepository = resolutionRepository;
     }
 
-    public List<Content> getAllContents() {
-        return contentRepository.findAll();
+    @Override
+    protected JpaRepository<Content, Long> getRepository() {
+        return contentRepository;
     }
 
     public Content getContentById(Long id) throws ResourceNotFoundException {
@@ -68,36 +71,6 @@ public class ContentService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-    }
-
-    public Content createContent(Content content) {
-        return contentRepository.save(content);
-    }
-
-    public ResponseEntity<?> updateContent(Long id, Content updatedContent)
-    {
-        try {
-            System.out.println("Type: " + updatedContent.getType());
-            contentRepository.updateContentById(
-                    id,
-                    updatedContent.getTitle(),
-                    updatedContent.getDescription(),
-                    updatedContent.getVideoLink(),
-                    updatedContent.getDuration(),
-                    updatedContent.getType() != null ? updatedContent.getType().toString().toUpperCase() : null,
-                    updatedContent.getSeason(),
-                    updatedContent.getEpisodeNumber(),
-                    updatedContent.getSeriesId()
-            );
-
-            return ResponseEntity.ok(contentRepository.findContentById(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update content: " + e.getMessage());
-        }
-    }
-
-    public void deleteContent(Long id) {
-        contentRepository.deleteById(id);
     }
 
     public void addEpisodeToSeries(Integer seriesId, Content episode) {

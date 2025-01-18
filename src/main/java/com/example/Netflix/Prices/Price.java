@@ -15,7 +15,6 @@ public class Price {
     @Id
     private Integer id;
     @NotBlank(message = "Price is required")
-    @Pattern(regexp = "^[0-9.,]+$", message = "Price format is invalid")
     private double price;
     @OneToMany
     @NotBlank(message = "Resolutions are required")

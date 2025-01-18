@@ -1,5 +1,7 @@
 package com.example.Netflix.Referals;
 
+import com.example.Netflix.Generalization.BaseController;
+import com.example.Netflix.Generalization.BaseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,17 +14,16 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/referrals")
-public class ReferralController {
+public class ReferralController extends BaseController<Referral, Long> {
     @Autowired
     private ReferralService referralService;
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> saveReferralProcedure(@RequestBody @Valid Referral referralBody) {
-        return referralService.saveReferral(referralBody.getHostId(), referralBody.getInvitedId());
+    @Override
+    protected BaseService<Referral, Long> getService() {
+        return referralService;
     }
 
-    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(value = "/invited/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getReferralByInvitedId(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(referralService.getReferralByInvitedId(id));

@@ -13,16 +13,6 @@ import java.util.UUID;
 
 @Repository
 public interface ReferralRepository extends JpaRepository<Referral, Long> {
-    Optional<Referral> findReferralByInvitedId(UUID id);
-
-    @Modifying
-    @Transactional
-    @Query(value = "CALL save_referral(:hostId, :invitedId)", nativeQuery = true)
-    void saveReferral(
-            @Param("hostId") UUID hostId,
-            @Param("invitedId") UUID invitedId
-    );
-
     @Query(value = "SELECT referral_id_out AS id, host_id_out AS host_id, invited_id_out AS invited_id " +
             "FROM get_referral_by_invited_id(:invitedId);",
             nativeQuery = true)

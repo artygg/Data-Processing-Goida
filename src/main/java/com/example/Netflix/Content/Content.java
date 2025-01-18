@@ -40,7 +40,6 @@ public class Content
     private String videoLink;
 
     @NotNull(message = "Duration is required")
-    @Pattern(regexp = "^[0-9.,]+$", message = "Duration format is invalid")
     private Double duration;
 
     @JsonDeserialize(using = StatusDeserializer.class)

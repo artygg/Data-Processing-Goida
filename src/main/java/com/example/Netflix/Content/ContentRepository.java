@@ -24,19 +24,4 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
 
     @Query("SELECT c FROM Content c JOIN c.resolutions r WHERE r.id = :resolutionId")
     List<Content> findAllByResolutionId(@Param("resolutionId") Long resolutionId);
-
-    @Modifying
-    @Transactional
-    @Query(value = "CALL update_content_by_id(:id, :title, :description, :videoLink, :duration, :type, :season, :episodeNumber, :seriesId)", nativeQuery = true)
-    void updateContentById(
-            @org.springframework.data.repository.query.Param("id") Long id,
-            @org.springframework.data.repository.query.Param("title") String title,
-            @org.springframework.data.repository.query.Param("description") String description,
-            @org.springframework.data.repository.query.Param("videoLink") String videoLink,
-            @org.springframework.data.repository.query.Param("duration") Double duration,
-            @org.springframework.data.repository.query.Param("type") String type,
-            @org.springframework.data.repository.query.Param("season") Integer season,
-            @org.springframework.data.repository.query.Param("episodeNumber") Integer episodeNumber,
-            @org.springframework.data.repository.query.Param("seriesId") Integer seriesId
-    );
 }

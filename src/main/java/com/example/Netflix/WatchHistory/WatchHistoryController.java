@@ -1,6 +1,7 @@
 package com.example.Netflix.WatchHistory;
 
-import jakarta.validation.Valid;
+import com.example.Netflix.Generalization.BaseController;
+import com.example.Netflix.Generalization.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/watchHistory")
-public class WatchHistoryController {
+public class WatchHistoryController extends BaseController<WatchHistory, Long> {
 
     @Autowired
     private final WatchHistoryService watchHistoryService;
@@ -19,15 +20,14 @@ public class WatchHistoryController {
         this.watchHistoryService = watchHistoryService;
     }
 
+    @Override
+    protected BaseService<WatchHistory, Long> getService() {
+        return watchHistoryService;
+    }
+
     @GetMapping(value = "/profile/{profileId}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public List<WatchHistory> getWatchHistoryByProfileId(@PathVariable UUID profileId) {
         return watchHistoryService.getWatchHistoryByProfileId(profileId);
-    }
-
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public WatchHistory createWatchHistory(@RequestBody @Valid WatchHistory watchHistory) {
-        return watchHistoryService.createWatchHistory(watchHistory);
     }
 }

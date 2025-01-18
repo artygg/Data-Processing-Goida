@@ -1,16 +1,11 @@
 package com.example.Netflix.Profiles;
 
 import com.example.Netflix.Content.Content;
-import com.example.Netflix.Content.ContentService;
 import com.example.Netflix.Exceptions.ProfileLimitReached;
-import com.example.Netflix.Genre.Genre;
+
 import com.example.Netflix.JSON.ResponseMessage;
-import com.example.Netflix.Preferences.Preferences;
 import com.example.Netflix.Preferences.PreferencesRequest;
-import com.example.Netflix.Users.User;
-import com.example.Netflix.Users.UserService;
-import com.example.Netflix.enums.Classification;
-import com.example.Netflix.enums.Language;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @RestController

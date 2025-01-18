@@ -1,6 +1,9 @@
 package com.example.Netflix.Content;
 
 import com.example.Netflix.Exceptions.ResourceNotFoundException;
+import com.example.Netflix.Generalization.BaseController;
+import com.example.Netflix.Generalization.BaseService;
+import com.example.Netflix.Generalization.BaseServiceInterface;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/contents")
-public class ContentController {
+public class ContentController extends BaseController<Content, Long> {
     private final ContentService contentService;
 
     @Autowired
@@ -24,14 +27,9 @@ public class ContentController {
         this.contentService = contentService;
     }
 
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<Content> getAllContents() {
-        return contentService.getAllContents();
-    }
-
-    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Content getContentById(@PathVariable Long id) throws ResourceNotFoundException {
-        return contentService.getContentById(id);
+    @Override
+    protected BaseService<Content, Long> getService() {
+        return contentService;
     }
 
     @GetMapping(value = "/films", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -59,56 +57,11 @@ public class ContentController {
         return contentService.getContentsByResolution(resolutionId);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createContent(@Valid @RequestBody Content content) {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
-            }
-
-            Content savedContent = contentService.createContent(content);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedContent);
-
-        } catch (ConstraintViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation error: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating content: " + e.getMessage());
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateContent(@PathVariable Long id, @Valid @RequestBody Content updatedContent)
-    {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
-            }
-
-            return ResponseEntity.ok(contentService.updateContent(id, updatedContent));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating content: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContent(@PathVariable Long id) {
-        try {
-            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal()).getUsername();
-            contentService.deleteContent(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
-        }
-    }
-
     @PostMapping("/series/{seriesId}/episodes")
     public ResponseEntity<?> addEpisodeToSeries(@PathVariable Integer seriesId, @RequestBody Content episode) {
         try {
             contentService.addEpisodeToSeries(seriesId, episode);
+
             return ResponseEntity.status(HttpStatus.CREATED).body("Episode added to series.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
@@ -116,30 +69,30 @@ public class ContentController {
     }
 
     @PostMapping("/{contentId}/genres/{genreId}")
-    public ResponseEntity<?> addGenreToContent(@PathVariable Long contentId, @PathVariable Long genreId) throws ResourceNotFoundException
-    {
+    public ResponseEntity<?> addGenreToContent(@PathVariable Long contentId, @PathVariable Long genreId) throws ResourceNotFoundException {
         contentService.addGenreToContent(contentId, genreId);
+
         return ResponseEntity.ok("Genre added to content.");
     }
 
     @DeleteMapping("/{contentId}/genres/{genreId}")
-    public ResponseEntity<?> removeGenreFromContent(@PathVariable Long contentId, @PathVariable Long genreId) throws ResourceNotFoundException
-    {
+    public ResponseEntity<?> removeGenreFromContent(@PathVariable Long contentId, @PathVariable Long genreId) throws ResourceNotFoundException {
         contentService.removeGenreFromContent(contentId, genreId);
+
         return ResponseEntity.ok("Genre removed from content.");
     }
 
     @PostMapping("/{contentId}/resolutions/{resolutionId}")
-    public ResponseEntity<?> addResolutionToContent(@PathVariable Long contentId, @PathVariable Long resolutionId) throws ResourceNotFoundException
-    {
+    public ResponseEntity<?> addResolutionToContent(@PathVariable Long contentId, @PathVariable Long resolutionId) throws ResourceNotFoundException {
         contentService.addResolutionToContent(contentId, resolutionId);
+
         return ResponseEntity.ok("Resolution added to content.");
     }
 
     @DeleteMapping("/{contentId}/resolutions/{resolutionId}")
-    public ResponseEntity<?> removeResolutionFromContent(@PathVariable Long contentId, @PathVariable Long resolutionId) throws ResourceNotFoundException
-    {
+    public ResponseEntity<?> removeResolutionFromContent(@PathVariable Long contentId, @PathVariable Long resolutionId) throws ResourceNotFoundException {
         contentService.removeResolutionFromContent(contentId, resolutionId);
+
         return ResponseEntity.ok("Resolution removed from content.");
     }
 }

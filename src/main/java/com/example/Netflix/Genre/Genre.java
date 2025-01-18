@@ -24,7 +24,6 @@ public class Genre {
     private String name;
 
     @ManyToMany(mappedBy = "genres")
-    @NotBlank(message = "Content is required")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Content> contents;
 

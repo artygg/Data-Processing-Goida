@@ -1,5 +1,7 @@
 package com.example.Netflix.Resolutions;
 
+import com.example.Netflix.Generalization.BaseController;
+import com.example.Netflix.Generalization.BaseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,60 +15,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/resolutions")
-public class ResolutionController {
+public class ResolutionController extends BaseController<Resolution, Integer> {
     @Autowired
     private ResolutionService resolutionService;
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createResolution(@RequestBody @Valid Resolution resolution) {
-        try {
-            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-
-            resolutionService.saveResolution(resolution);
-            return ResponseEntity.ok("Resolution created successfully: " + resolution);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
-        }
-    }
-
-    @GetMapping(value = "/{id}",
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getResolution(@PathVariable int id) {
-        try {
-            Optional<Resolution> optionalResolution = resolutionService.findResolutionById(id);
-
-            if (optionalResolution.isPresent()) {
-                Resolution resolution = optionalResolution.get();
-
-                return ResponseEntity.ok(resolution);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Resolution not found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
-        }
-    }
-
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<Resolution> findAllResolutions() {
-        return resolutionService.findAllResolutions();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteResolution(@PathVariable int id) {
-        try {
-            ((org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-
-            try {
-                resolutionService.deleteResolution(id);
-
-                return ResponseEntity.ok("Resolution deleted successfully");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
-        }
+    @Override
+    protected BaseService<Resolution, Integer> getService() {
+        return resolutionService;
     }
 }

@@ -1,31 +1,21 @@
 package com.example.Netflix.Resolutions;
 
+import com.example.Netflix.Generalization.BaseService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ResolutionService {
+public class ResolutionService extends BaseService<Resolution, Integer> {
     @Autowired
     private ResolutionRepository resolutionRepository;
 
-    @Transactional
-    public void saveResolution(Resolution resolution) {
-        resolutionRepository.save(resolution);
-    }
-    public Optional<Resolution> findResolutionById(int id) {
-        return resolutionRepository.findResolutionById(id);
-    }
-
-    public List<Resolution> findAllResolutions() {
-        return resolutionRepository.findAll();
-    }
-
-    @Transactional
-    public void deleteResolution(int id) {
-        resolutionRepository.deleteById(id);
+    @Override
+    protected JpaRepository<Resolution, Integer> getRepository() {
+        return resolutionRepository;
     }
 }
