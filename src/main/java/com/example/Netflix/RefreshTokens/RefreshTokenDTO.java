@@ -18,4 +18,3 @@ public class RefreshTokenDTO {
         this.token = token;
     }
 }
-

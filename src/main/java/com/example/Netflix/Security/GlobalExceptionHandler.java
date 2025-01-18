@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
         ex.getConstraintViolations().forEach(violation ->
                 errors.put(violation.getPropertyPath().toString(), violation.getMessage())
         );
+
         return ResponseEntity.badRequest().body(errors);
     }
 
@@ -27,6 +28,7 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
+
         return ResponseEntity.badRequest().body(errors);
     }
 }

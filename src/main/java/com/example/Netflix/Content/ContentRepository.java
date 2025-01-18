@@ -39,5 +39,4 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             @org.springframework.data.repository.query.Param("episodeNumber") Integer episodeNumber,
             @org.springframework.data.repository.query.Param("seriesId") Integer seriesId
     );
-
 }

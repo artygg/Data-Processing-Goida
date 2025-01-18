@@ -3,50 +3,41 @@ package com.example.Netflix.Subtitle;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class SubtitleId implements Serializable
-{
+public class SubtitleId implements Serializable {
     private Long contentId;
     private String language;
 
-    public SubtitleId(Long contentId, String language)
-    {
+    public SubtitleId(Long contentId,
+                      String language) {
         this.contentId = contentId;
         this.language = language;
     }
 
-    public SubtitleId()
-    {
+    public SubtitleId() {
     }
 
-    public Long getContentId()
-    {
+    public Long getContentId() {
         return contentId;
     }
 
-    public void setContentId(Long contentId)
-    {
+    public void setContentId(Long contentId) {
         this.contentId = contentId;
     }
 
-    public String getLanguage()
-    {
+    public String getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language)
-    {
+    public void setLanguage(String language) {
         this.language = language;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
-        {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         SubtitleId that = (SubtitleId) o;
@@ -54,8 +45,7 @@ public class SubtitleId implements Serializable
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(contentId, language);
     }
 }

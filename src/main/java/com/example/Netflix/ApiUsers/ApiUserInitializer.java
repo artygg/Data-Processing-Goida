@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 public class ApiUserInitializer implements CommandLineRunner {
     @Autowired
     private ApiUserService apiUserService;
+
     @Value("${ADMIN_LOGIN}")
     private String adminLogin;
+
     @Value("${ADMIN_PASSWORD}")
     private String adminPassword;
 

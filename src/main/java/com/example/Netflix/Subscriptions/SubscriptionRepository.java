@@ -33,11 +33,9 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
             @Param("subscriptionCost") Double subscriptionCost
     );
 
-
     @Transactional
     @Modifying
     @Query(value = "CALL apply_discount_for_invitation(:inviterProfileId, :inviteeProfileId)", nativeQuery = true)
     void applyDiscountForInvitation(@Param("inviterProfileId") UUID inviterProfileId,
                                     @Param("inviteeProfileId") UUID inviteeProfileId);
 }
-

@@ -20,25 +20,34 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
     @ManyToOne
     @JsonBackReference
     private User user;
+
     @NotBlank(message = "Profile name is required")
     @Pattern(regexp = "^[a-zA-Z0-9.!?\" ]+$", message = "Profile name format is invalid")
     private String profileName;
+
     private String profilePhoto;
     private LocalDate age;
+
     @Enumerated(EnumType.STRING)
     @Pattern(regexp = "^[a-zA-Z]+$", message = "Language format is invalid")
     private Language language;
+
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private Preferences preferences;
+
     @OneToMany(mappedBy = "profileId")
     private List<WatchHistory> watchHistories;
+
     @OneToMany
     private List<Content> watchList;
+
     @OneToMany
     private List<Content> watchLater;
+
     private boolean isChild;
 
     public Profile() {

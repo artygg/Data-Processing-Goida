@@ -26,37 +26,31 @@ public class Subtitle {
     @NotBlank(message = "Content is required")
     private Content content;
 
-    public Subtitle()
-    {
+    public Subtitle() {
+
     }
 
-    public Long getContentId()
-    {
+    public Long getContentId() {
         return contentId;
     }
 
-    public void setContentId(Long contentId)
-    {
+    public void setContentId(Long contentId) {
         this.contentId = contentId;
     }
 
-    public Language getLanguage()
-    {
+    public Language getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language)
-    {
+    public void setLanguage(Language language) {
         this.language = language;
     }
 
-    public Content getContent()
-    {
+    public Content getContent() {
         return content;
     }
 
-    public void setContent(Content content)
-    {
+    public void setContent(Content content) {
         this.content = content;
     }
 }

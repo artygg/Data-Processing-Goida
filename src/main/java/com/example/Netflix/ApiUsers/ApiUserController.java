@@ -30,10 +30,13 @@ import java.util.Optional;
 public class ApiUserController {
     @Autowired
     private ApiUserService apiUserService;
+
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private JwtTokenFactory jwtTokenFactory;
+
     @Autowired
     private RefreshTokenService refreshTokenService;
 

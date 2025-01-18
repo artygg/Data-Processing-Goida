@@ -8,6 +8,7 @@ import java.util.UUID;
 public class UsersIdBody {
     @NotNull(message = "Host id required")
     private UUID inviterProfileId;
+
     @NotNull(message = "Invited user id required")
     private UUID inviteeProfileId;
 

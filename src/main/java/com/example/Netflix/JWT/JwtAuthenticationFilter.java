@@ -38,8 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
-    ) throws ServletException, IOException
-    {
+    ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -49,18 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
-            System.out.println("JWT: " + jwt);
             final String userEmail = jwtTokenFactory.getUsernameFromToken(jwt);
-            System.out.println("User: " + userEmail);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            System.out.println("AUTH: " + authentication);
 
             if (userEmail != null && authentication == null) {
                 UserDetails userDetails = this.customDetailsService.loadUserByUsername(userEmail);
-
-                System.out.println("User details: " + userDetails);
 
                 if (jwtTokenFactory.validateToken(jwt)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -70,13 +64,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    System.out.println("Auth token: " + authToken);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-
-            System.out.println("Security context: " + SecurityContextHolder.getContext());
-            System.out.println("Request: " + request + "Response: " + response);
 
             try {
                 filterChain.doFilter(request, response);

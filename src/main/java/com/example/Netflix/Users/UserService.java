@@ -46,6 +46,7 @@ public class UserService {
     public ResponseEntity<?> updateUserCredentials(UUID id, User userRequestBody) {
         try {
             userRepository.updateUserCredentials(id, userRequestBody.getEmail(), userRequestBody.getPassword());
+
             return ResponseEntity.ok(userRequestBody);
         } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

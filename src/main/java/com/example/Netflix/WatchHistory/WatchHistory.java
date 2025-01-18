@@ -38,77 +38,63 @@ public class WatchHistory {
     @JoinColumn(name = "content_id", insertable = false, updatable = false)
     private Content content;
 
-    public WatchHistory()
-    {
+    public WatchHistory() {
+
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Long id)
-    {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public UUID getProfileId()
-    {
+    public UUID getProfileId() {
         return profileId;
     }
 
-    public void setProfileId(UUID profileId)
-    {
+    public void setProfileId(UUID profileId) {
         this.profileId = profileId;
     }
 
-    public Long getContentId()
-    {
+    public Long getContentId() {
         return contentId;
     }
 
-    public void setContentId(Long contentId)
-    {
+    public void setContentId(Long contentId) {
         this.contentId = contentId;
     }
 
-    public Double getStoppedAt()
-    {
+    public Double getStoppedAt() {
         return stoppedAt;
     }
 
-    public void setStoppedAt(Double stoppedAt)
-    {
+    public void setStoppedAt(Double stoppedAt) {
         this.stoppedAt = stoppedAt;
     }
 
-    public Double getProgress()
-    {
+    public Double getProgress() {
         return progress;
     }
 
-    public void setProgress(Double progress)
-    {
+    public void setProgress(Double progress) {
         this.progress = progress;
     }
 
-    public Integer getWatchingTimes()
-    {
+    public Integer getWatchingTimes() {
         return watchingTimes;
     }
 
-    public void setWatchingTimes(Integer watchingTimes)
-    {
+    public void setWatchingTimes(Integer watchingTimes) {
         this.watchingTimes = watchingTimes;
     }
 
-    public Content getContent()
-    {
+    public Content getContent() {
         return content;
     }
 
-    public void setContent(Content content)
-    {
+    public void setContent(Content content) {
         this.content = content;
     }
 }

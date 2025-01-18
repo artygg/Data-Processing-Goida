@@ -42,5 +42,4 @@ public class ValidationExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
-
 }

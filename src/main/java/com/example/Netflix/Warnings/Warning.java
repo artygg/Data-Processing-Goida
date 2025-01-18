@@ -12,9 +12,11 @@ public class Warning {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
     @OneToOne
     @JsonBackReference
     private User user;
+
     private int loginFaults;
     private LocalDateTime banEndDate;
 

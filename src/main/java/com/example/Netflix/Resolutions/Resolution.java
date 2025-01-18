@@ -18,9 +18,11 @@ public class Resolution {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "resolution_id")
     private Integer id;
+
     @NotNull(message = "Name is required")
     @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Title must contain only letters and numbers")
     private String name;
+
     @NotNull(message = "Content is required")
     @ManyToMany()
     @JoinTable(

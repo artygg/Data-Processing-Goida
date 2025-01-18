@@ -16,12 +16,16 @@ public class Preferences {
     private int id;
     private boolean isInterestedInSeries;
     private boolean isInterestedInFilms;
+
     @OneToMany
     private List<Genre> genres;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private List<Classification> classifications;
+
     private boolean isInterestedInFilmsWithMinimumAge;
+
     @OneToOne
     @JsonBackReference
     private Profile profile;

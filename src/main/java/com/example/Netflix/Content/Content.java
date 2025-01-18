@@ -24,16 +24,21 @@ public class Content
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "content_id")
     private Long id;
+
     @NotBlank(message = "Title is required")
     @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Title must contain only letters and numbers")
     private String title;
+
     @NotBlank(message = "Poster is required")
     private String poster;
+
     @NotBlank(message = "Description is required")
     @Pattern(regexp = "^[a-zA-Z0-9.!?\" ]+$", message = "Description format is invalid")
     private String description;
+
     @NotBlank(message = "Video link is required")
     private String videoLink;
+
     @NotNull(message = "Duration is required")
     @Pattern(regexp = "^[0-9.,]+$", message = "Duration format is invalid")
     private Double duration;
@@ -63,12 +68,23 @@ public class Content
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
 
-    public Content()
-    {
+    public Content() {
+
     }
 
-    public Content(String title, String poster, String description, String videoLink, Double duration, ContentType type, Integer season, Integer episodeNumber, Integer seriesId, LocalDateTime updatedAt, LocalDateTime createdAt, List<Resolution> resolutions, List<Genre> genres)
-    {
+    public Content(String title,
+                   String poster,
+                   String description,
+                   String videoLink,
+                   Double duration,
+                   ContentType type,
+                   Integer season,
+                   Integer episodeNumber,
+                   Integer seriesId,
+                   LocalDateTime updatedAt,
+                   LocalDateTime createdAt,
+                   List<Resolution> resolutions,
+                   List<Genre> genres) {
         this.setTitle(title);
         this.setPoster(poster);
         this.setDescription(description);
@@ -84,169 +100,133 @@ public class Content
         this.setGenres(genres);
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Long id)
-    {
-        if (id == null || id <= 0)
-        {
+    public void setId(Long id) {
+        if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID must be a positive number.");
         }
         this.id = id;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title)
-    {
-        if (title == null || title.trim().isEmpty())
-        {
+    public void setTitle(String title) {
+        if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title is required and cannot be empty.");
         }
         this.title = title;
     }
 
-    public String getPoster()
-    {
+    public String getPoster() {
         return poster;
     }
 
-    public void setPoster(String poster)
-    {
-        if (poster == null || poster.trim().isEmpty())
-        {
+    public void setPoster(String poster) {
+        if (poster == null || poster.trim().isEmpty()) {
             throw new IllegalArgumentException("Poster is required and cannot be empty.");
         }
         this.poster = poster;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description)
-    {
-        if (description == null || description.trim().isEmpty())
-        {
+    public void setDescription(String description) {
+        if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("Description is required and cannot be empty.");
         }
         this.description = description;
     }
 
-    public String getVideoLink()
-    {
+    public String getVideoLink() {
         return videoLink;
     }
 
-    public void setVideoLink(String videoLink)
-    {
-        if (videoLink == null || videoLink.trim().isEmpty())
-        {
+    public void setVideoLink(String videoLink) {
+        if (videoLink == null || videoLink.trim().isEmpty()) {
             throw new IllegalArgumentException("Video link is required and cannot be empty.");
         }
         this.videoLink = videoLink;
     }
 
-    public Double getDuration()
-    {
+    public Double getDuration() {
         return duration;
     }
 
-    public void setDuration(Double duration)
-    {
-        if (duration == null || duration <= 0)
-        {
+    public void setDuration(Double duration) {
+        if (duration == null || duration <= 0) {
             throw new IllegalArgumentException("Duration must be a positive number.");
         }
         this.duration = duration;
     }
 
-    public ContentType getType()
-    {
+    public ContentType getType() {
         return type;
     }
 
-    public void setType(ContentType type)
-    {
-        if (type == null)
-        {
+    public void setType(ContentType type) {
+        if (type == null) {
             throw new IllegalArgumentException("Content type is required.");
         }
         this.type = type;
     }
 
-    public Integer getSeason()
-    {
+    public Integer getSeason() {
         return season;
     }
 
-    public void setSeason(Integer season)
-    {
-        if (season != null && season < 1)
-        {
+    public void setSeason(Integer season) {
+        if (season != null && season < 1) {
             throw new IllegalArgumentException("Season number must be at least 1.");
         }
         this.season = season;
     }
 
-    public Integer getEpisodeNumber()
-    {
+    public Integer getEpisodeNumber() {
         return episodeNumber;
     }
 
-    public void setEpisodeNumber(Integer episodeNumber)
-    {
-        if (episodeNumber != null && episodeNumber < 1)
-        {
+    public void setEpisodeNumber(Integer episodeNumber) {
+        if (episodeNumber != null && episodeNumber < 1) {
             throw new IllegalArgumentException("Episode number must be at least 1.");
         }
         this.episodeNumber = episodeNumber;
     }
 
-    public Integer getSeriesId()
-    {
+    public Integer getSeriesId() {
         return seriesId;
     }
 
-    public void setSeriesId(Integer seriesId)
-    {
-        if (seriesId != null && seriesId < 1)
-        {
+    public void setSeriesId(Integer seriesId) {
+        if (seriesId != null && seriesId < 1) {
             throw new IllegalArgumentException("Series ID must be a positive number.");
         }
         this.seriesId = seriesId;
     }
 
-    public LocalDateTime getCreatedAt()
-    {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt)
-    {
-        if (createdAt == null)
-        {
+    public void setCreatedAt(LocalDateTime createdAt) {
+        if (createdAt == null) {
             throw new IllegalArgumentException("Created timestamp cannot be null.");
         }
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt()
-    {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt)
-    {
-        if (updatedAt == null)
-        {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        if (updatedAt == null) {
             throw new IllegalArgumentException("Updated timestamp cannot be null.");
         }
     }

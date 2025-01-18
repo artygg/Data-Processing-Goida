@@ -53,5 +53,4 @@ public class RefreshTokenController {
                     .body(Map.of("accessToken", newJwt));
         }
     }
-
 }

@@ -11,6 +11,7 @@ import java.util.Optional;
 public class ApiUserService {
     @Autowired
     private ApiUserRepository apiUserRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 

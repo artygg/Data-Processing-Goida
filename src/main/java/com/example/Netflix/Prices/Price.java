@@ -28,7 +28,9 @@ public class Price {
 
     }
 
-    public Price(Integer id, double price, List<Resolution> resolutions) {
+    public Price(Integer id,
+                 double price,
+                 List<Resolution> resolutions) {
         this.id = id;
         this.price = price;
         this.resolutions = resolutions;

@@ -29,6 +29,7 @@ public class Genre {
     private List<Content> contents;
 
     public Genre() {
+
     }
 
     public Long getId() { return id; }

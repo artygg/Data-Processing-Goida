@@ -27,6 +27,7 @@ public class SubtitleController {
             if (subtitles.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No subtitles found for content ID: " + contentId);
             }
+
             return ResponseEntity.ok(subtitles);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving subtitles: " + e.getMessage());
@@ -39,6 +40,7 @@ public class SubtitleController {
         try {
             String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             Subtitle createdSubtitle = subtitleService.createSubtitle(subtitle);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(createdSubtitle);
         } catch (ClassCastException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: Authentication failed.");
@@ -54,6 +56,7 @@ public class SubtitleController {
         try {
             String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             subtitleService.deleteSubtitle(contentId, language);
+
             return ResponseEntity.noContent().build();
         } catch (ClassCastException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: Authentication failed.");

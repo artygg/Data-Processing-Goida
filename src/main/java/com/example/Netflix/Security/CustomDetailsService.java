@@ -28,7 +28,6 @@ public class CustomDetailsService implements UserDetailsService {
             ApiUser apiUser = optionalUser.get();
             System.out.println("I am here as well!: " + apiUser.getLogin());
 
-
             return new org.springframework.security.core.userdetails.User(apiUser.getLogin(), apiUser.getPassword(), new ArrayList<>());
         }
 

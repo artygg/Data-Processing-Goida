@@ -31,6 +31,7 @@ public class PriceController {
 
             try {
                 priceService.savePrice(price);
+
                 return ResponseEntity.ok("Price saved successfully");
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -48,6 +49,7 @@ public class PriceController {
 
             try {
                 priceService.deletePrice(id);
+
                 return ResponseEntity.ok("Price was deleted successfully");
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -57,4 +59,3 @@ public class PriceController {
         }
     }
 }
-

@@ -33,9 +33,7 @@ public class ProfileController {
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createProfile(@RequestBody @Valid ProfileDTO profileBody) throws ProfileLimitReached {
         try {
-            System.out.println("Context: " + SecurityContextHolder.getContext().getAuthentication());
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println("System user: " + username);
             if (username == null || username.isEmpty()) {
                 throw new ClassCastException();
             }

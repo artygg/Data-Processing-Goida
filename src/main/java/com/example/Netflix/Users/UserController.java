@@ -52,6 +52,7 @@ public class UserController {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
+
             return ResponseEntity.ok(user);
         }
 

@@ -17,9 +17,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
     @NotBlank(message = "Email is required")
     @Pattern(regexp = ".*@.*mail\\.com$", message = "Invalid format of an email address")
     private String email;
+
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     @Pattern(
@@ -27,12 +29,15 @@ public class User {
             message = "Password must contain at least one uppercase letter, one lowercase letter and one special character"
     )
     private String password;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Profile> profiles;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Warning warning;
+
     private boolean hasUsedReferralLink;
     private boolean isBanned;
     private String token;
@@ -126,5 +131,4 @@ public class User {
     public void setHasUsedReferralLink(boolean hasUsedReferralLink) {
         this.hasUsedReferralLink = hasUsedReferralLink;
     }
-
 }
