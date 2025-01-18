@@ -29,6 +29,16 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void registration(String email, String password, String token) {
+        try {
+            String hashedPassword = passwordEncoder.encode(password);
+
+            userRepository.registerUser(email, hashedPassword, token);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed registration of a user: " + e.getMessage());
+        }
+    }
+
     public void updateUser(User user) {
         userRepository.save(user);
     }

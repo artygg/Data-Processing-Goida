@@ -4,6 +4,7 @@ import com.example.Netflix.Deserializer.StatusDeserializer;
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.enums.ContentType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
@@ -43,13 +44,20 @@ public class Content
     private Integer seriesId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    @ManyToMany
-    @JoinTable(name = "quality_ranges", joinColumns = @JoinColumn(name = "content_id"), inverseJoinColumns = @JoinColumn(name = "resolution_id"))
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "quality_ranges",
+            joinColumns = @JoinColumn(name = "content_id"),
+            inverseJoinColumns = @JoinColumn(name = "resolution_id")
+    )
     @JsonManagedReference
     private List<Resolution> resolutions;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "genre_contents", joinColumns = @JoinColumn(name = "content_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @JoinTable(name = "genre_contents",
+            joinColumns = @JoinColumn(name = "content_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
     @JsonManagedReference
     private Set<Genre> genres;
 

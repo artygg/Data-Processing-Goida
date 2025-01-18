@@ -3,6 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/sql/Netflix.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/sql/stored_procedures.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/sql/trigger_script.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/example/Netflix/Content/ContentRepository.java" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/example/Netflix/Profiles/ProfileRepository.java" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/example/Netflix/Referals/ReferralRepository.java" dialect="PostgreSQL" />

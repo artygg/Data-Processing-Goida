@@ -33,7 +33,7 @@ public class Profile {
     private List<WatchHistory> watchHistories;
     @OneToMany
     private List<Content> watchList;
-    @ManyToMany
+    @OneToMany
     private List<Content> watchLater;
     private boolean isChild;
 

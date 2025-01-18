@@ -18,12 +18,7 @@ public class Resolution {
     @NotNull(message = "Name is required")
     private String name;
     @NotNull(message = "Content is required")
-    @ManyToMany
-    @JoinTable(
-            name = "quality_ranges",
-            inverseJoinColumns = @JoinColumn(name = "content_id"),
-            joinColumns = @JoinColumn(name = "resolution_id")
-    )
+    @ManyToMany(mappedBy = "resolutions")
     @JsonBackReference
     private List<Content> contents;
 

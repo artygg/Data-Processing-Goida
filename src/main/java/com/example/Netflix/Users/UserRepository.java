@@ -26,4 +26,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Modifying
     @Query(value = "CALL create_referral(:hostUserId, :invitedUserId)", nativeQuery = true)
     void createReferral(@Param("hostUserId") UUID hostUserId, @Param("invitedUserId") UUID invitedUserId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "CALL register_user(:email, :password, :token)", nativeQuery = true)
+    void registerUser(@Param("email") String email,
+                      @Param("password") String password,
+                      @Param("token") String token);
 }

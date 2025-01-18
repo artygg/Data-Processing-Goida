@@ -65,7 +65,7 @@ public class ApiUserController {
 
                     return ResponseEntity.ok()
                             .header(HttpHeaders.SET_COOKIE, "refreshToken=" + refreshToken.getToken() + "; HttpOnly; Secure; Path=/api/auth/refresh; Max-Age=604800")
-                            .body(Map.of("user", user));
+                            .body(Map.of("token: ", user.getToken()));
                 } catch (BadCredentialsException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Wrong credentials"));
                 } catch (Exception e) {

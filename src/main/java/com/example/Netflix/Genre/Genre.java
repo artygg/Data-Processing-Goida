@@ -18,9 +18,9 @@ public class Genre {
     @NotBlank(message = "Name is required")
     private String name;
 
-    @JsonBackReference
     @ManyToMany(mappedBy = "genres")
     @NotBlank(message = "Content is required")
+    @JsonBackReference
     private Set<Content> contents;
 
     public Genre() {

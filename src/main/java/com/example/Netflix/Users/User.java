@@ -2,15 +2,13 @@ package com.example.Netflix.Users;
 
 import com.example.Netflix.Exceptions.ProfileLimitReached;
 import com.example.Netflix.Profiles.Profile;
-import com.example.Netflix.Subscriptions.Subscription;
 import com.example.Netflix.Warnings.Warning;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-import java.rmi.server.UID;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -20,8 +18,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @NotBlank(message = "Email is required")
+    @Pattern(regexp = ".*@.*mail\\.com$", message = "Invalid format of an email address")
     private String email;
     @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Pattern(
+            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
+            message = "Password must contain at least one uppercase letter, one lowercase letter and one special character"
+    )
     private String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference

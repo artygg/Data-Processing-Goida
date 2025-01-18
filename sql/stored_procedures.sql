@@ -1,58 +1,58 @@
 REVOKE INSERT, UPDATE, DELETE ON TABLE Users, profiles, Subscriptions, contents FROM PUBLIC;
 
-CREATE OR REPLACE PROCEDURE sp_admin_create_user (
-    p_email        VARCHAR(255),
-    p_password     VARCHAR(255),
-    p_has_referral BOOLEAN DEFAULT FALSE
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    INSERT INTO Users (email, password, has_used_referral_link)
-    VALUES (p_email, p_password, p_has_referral);
+-- CREATE OR REPLACE PROCEDURE sp_admin_create_user (
+--     p_email        VARCHAR(255),
+--     p_password     VARCHAR(255),
+--     p_has_referral BOOLEAN DEFAULT FALSE
+-- )
+--     LANGUAGE plpgsql
+--     SECURITY DEFINER
+-- AS $$
+-- BEGIN
+--     INSERT INTO Users (email, password, has_used_referral_link)
+--     VALUES (p_email, p_password, p_has_referral);
+--
+--     RAISE NOTICE 'New user created with email: %', p_email;
+-- END;
+-- $$;
 
-    RAISE NOTICE 'New user created with email: %', p_email;
-END;
-$$;
+-- CREATE OR REPLACE PROCEDURE sp_admin_update_user (
+--     p_user_id      INT,
+--     p_email        VARCHAR(255),
+--     p_password     VARCHAR(255),
+--     p_has_referral BOOLEAN
+-- )
+--     LANGUAGE plpgsql
+--     SECURITY DEFINER
+-- AS $$
+-- BEGIN
+--     UPDATE Users
+--     SET email = p_email,
+--         password = p_password,
+--         has_used_referral_link = p_has_referral
+--     WHERE id = p_user_id;
+--
+--     IF NOT FOUND THEN
+--         RAISE EXCEPTION 'User with id % not found', p_user_id;
+--     END IF;
+-- END;
+-- $$;
 
-CREATE OR REPLACE PROCEDURE sp_admin_update_user (
-    p_user_id      INT,
-    p_email        VARCHAR(255),
-    p_password     VARCHAR(255),
-    p_has_referral BOOLEAN
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    UPDATE Users
-       SET email = p_email,
-           password = p_password,
-           has_used_referral_link = p_has_referral
-     WHERE id = p_user_id;
-
-    IF NOT FOUND THEN
-      RAISE EXCEPTION 'User with id % not found', p_user_id;
-    END IF;
-END;
-$$;
-
-CREATE OR REPLACE PROCEDURE sp_admin_delete_user (
-    p_user_id INT
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    DELETE FROM Users
-     WHERE id = p_user_id;
-
-    IF NOT FOUND THEN
-      RAISE EXCEPTION 'User with id % not found', p_user_id;
-    END IF;
-END;
-$$;
+-- CREATE OR REPLACE PROCEDURE sp_admin_delete_user (
+--     p_user_id INT
+-- )
+--     LANGUAGE plpgsql
+--     SECURITY DEFINER
+-- AS $$
+-- BEGIN
+--     DELETE FROM Users
+--     WHERE id = p_user_id;
+--
+--     IF NOT FOUND THEN
+--         RAISE EXCEPTION 'User with id % not found', p_user_id;
+--     END IF;
+-- END;
+-- $$;
 
 -- GRANT EXECUTE ON PROCEDURE
 --     sp_admin_create_user(VARCHAR, VARCHAR, BOOLEAN),
@@ -71,8 +71,8 @@ CREATE OR REPLACE PROCEDURE sp_create_content (
     p_episode_num  INT DEFAULT NULL,
     p_series_id    INT DEFAULT NULL
 )
-LANGUAGE plpgsql
-SECURITY DEFINER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
 AS $$
 DECLARE
     v_new_id INT;
@@ -88,15 +88,15 @@ $$;
 CREATE OR REPLACE PROCEDURE sp_delete_content (
     p_content_id INT
 )
-LANGUAGE plpgsql
-SECURITY DEFINER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
 AS $$
 BEGIN
     DELETE FROM contents
-     WHERE id = p_content_id;
+    WHERE id = p_content_id;
 
     IF NOT FOUND THEN
-      RAISE EXCEPTION 'Content with id % not found', p_content_id;
+        RAISE EXCEPTION 'Content with id % not found', p_content_id;
     END IF;
 END;
 $$;
@@ -117,26 +117,26 @@ CREATE OR REPLACE PROCEDURE update_content_by_id(
     p_episode_number INTEGER,
     p_series_id INTEGER
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 BEGIN
     IF EXISTS (SELECT 1 FROM public.contents WHERE id = p_id) THEN
-UPDATE public.contents
-SET
-    title = p_title,
-    description = p_description,
-    video_link = p_video_link,
-    duration = p_duration,
-    type = p_type,
-    season = p_season,
-    episode_number = p_episode_number,
-    series_id = p_series_id,
-    updated_at = CURRENT_TIMESTAMP
-WHERE id = p_id;
-RAISE NOTICE 'Content with ID % successfully updated.', p_id;
-ELSE
+        UPDATE public.contents
+        SET
+            title = p_title,
+            description = p_description,
+            video_link = p_video_link,
+            duration = p_duration,
+            type = p_type,
+            season = p_season,
+            episode_number = p_episode_number,
+            series_id = p_series_id,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = p_id;
+        RAISE NOTICE 'Content with ID % successfully updated.', p_id;
+    ELSE
         RAISE EXCEPTION 'Content with ID % does not exist.', p_id;
-END IF;
+    END IF;
 END;
 $$;
 ----------------------
@@ -182,50 +182,38 @@ END;
 $$;
 ----------------------
 CREATE OR REPLACE PROCEDURE remove_from_watch_later(
-    profile_id UUID,
-    content_id BIGINT
+    profile_id_in UUID,
+    content_id_in BIGINT
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-profile_exists BOOLEAN;
+    profile_exists BOOLEAN;
     content_exists BOOLEAN;
-    watch_later JSONB;
-    updated_watch_later JSONB;
 BEGIN
-SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
+    -- Check if profile exists
+    SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id_in) INTO profile_exists;
 
-IF NOT profile_exists THEN
-        RAISE EXCEPTION 'Profile with ID % not found', profile_id;
-END IF;
+    IF NOT profile_exists THEN
+        RAISE EXCEPTION 'Profile with ID % not found', profile_id_in;
+    END IF;
 
-SELECT EXISTS (SELECT 1 FROM public.contents WHERE id = content_id) INTO content_exists;
+    -- Check if content exists
+    SELECT EXISTS (SELECT 1 FROM public.contents WHERE id = content_id_in) INTO content_exists;
 
-IF NOT content_exists THEN
-        RAISE EXCEPTION 'Content with ID % not found', content_id;
-END IF;
+    IF NOT content_exists THEN
+        RAISE EXCEPTION 'Content with ID % not found', content_id_in;
+    END IF;
 
-SELECT watch_later INTO watch_later
-FROM public.profiles
-WHERE id = profile_id;
+    -- Delete the entry from profiles_watch_later table
+    DELETE FROM public.profiles_watch_later
+    WHERE profile_id = profile_id_in AND profiles_watch_later.watch_later_content_id = content_id_in;
 
-IF watch_later IS NOT NULL THEN
-        updated_watch_later := (
-            SELECT jsonb_agg(elem)
-            FROM jsonb_array_elements(watch_later) elem
-            WHERE (elem->>'id')::BIGINT != content_id
-        );
-ELSE
-        updated_watch_later := '[]'::JSONB;
-END IF;
-
-UPDATE public.profiles
-SET watch_later = updated_watch_later
-WHERE id = profile_id;
-
-RAISE NOTICE 'Successfully removed content with ID % from watch later list.', content_id;
+    -- Optionally, you can return a success message
+    RAISE NOTICE 'Successfully removed content with ID % from watch later list.', content_id_in;
 END;
 $$;
+
 ----------------------
 CREATE OR REPLACE PROCEDURE update_profile(
     profile_id UUID,
@@ -401,8 +389,8 @@ $$;
 ----------------------
 CREATE OR REPLACE PROCEDURE get_resolution_by_id(
     resolution_id_param INTEGER,
-    OUT resolution_id INTEGER,
-    OUT name VARCHAR
+    OUT resolution_id_out INTEGER,
+    OUT name_out VARCHAR
 )
     LANGUAGE plpgsql
 AS
@@ -410,7 +398,7 @@ $$
 BEGIN
     -- Explicitly qualify the table column with the table name
     SELECT r.resolution_id, r.name
-    INTO resolution_id, name
+    INTO resolution_id_out, name_out
     FROM public.resolution r
     WHERE r.resolution_id = resolution_id_param;
 
@@ -423,21 +411,21 @@ $$;
 
 ----------------------
 CREATE OR REPLACE PROCEDURE create_trial_subscription(profile_id UUID)
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-profile_exists BOOLEAN;
+    profile_exists BOOLEAN;
     start_date DATE := CURRENT_DATE;
     end_date DATE := CURRENT_DATE + INTERVAL '7 days';
 BEGIN
-SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
+    SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
 
-IF NOT profile_exists THEN
+    IF NOT profile_exists THEN
         RAISE EXCEPTION 'Profile not found';
-END IF;
+    END IF;
 
-INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-VALUES (uuid_generate_v4(), start_date, end_date, profile_id, 0.0);
+    INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
+    VALUES (uuid_generate_v4(), start_date, end_date, profile_id, 0.0);
 END;
 $$;
 ----------------------
@@ -447,7 +435,6 @@ CREATE OR REPLACE PROCEDURE create_subscription(
     start_date_insert DATE,
     end_date_insert DATE,
     subscription_cost DOUBLE PRECISION
-
 )
     LANGUAGE plpgsql
 AS $$
@@ -458,25 +445,29 @@ BEGIN
     -- Profile check
     SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
     IF NOT profile_exists THEN
-        RAISE EXCEPTION 'Profile not found';
+        RAISE EXCEPTION 'Profile with ID % not found', profile_id;
     END IF;
 
     -- Price validation
     SELECT price INTO price_amount FROM public.price WHERE id = price_id;
-    IF price_amount IS NULL THEN
-        RAISE EXCEPTION 'Price not found for the given price_id';
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Price not found for the given price_id: %', price_id;
+    END IF;
+
+    -- Date validation
+    IF end_date_insert <= start_date_insert THEN
+        RAISE EXCEPTION 'End date must be after the start date';
     END IF;
 
     -- Insert subscription
     INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
     VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id);
 
+    -- Output cost
+    subscription_cost := price_amount;
 
     -- Output notice
-    RAISE NOTICE 'Subscription created successfully for Profile ID: %', profile_id;
-
-    -- Set subscription cost as output
-    subscription_cost := price_amount;
+    RAISE NOTICE 'Subscription created successfully for Profile ID: %, Cost: %', profile_id, subscription_cost;
 END;
 $$;
 
@@ -485,47 +476,47 @@ CREATE OR REPLACE PROCEDURE apply_discount_for_invitation(
     inviter_profile_id UUID,
     invitee_profile_id UUID
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-inviter_subscription_id UUID;
+    inviter_subscription_id UUID;
     invitee_subscription_id UUID;
     inviter_price_id INTEGER;
     invitee_price_id INTEGER;
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = inviter_profile_id) THEN
         RAISE EXCEPTION 'Inviter profile not found';
-END IF;
+    END IF;
 
     IF NOT EXISTS (SELECT 1 FROM public.profiles WHERE id = invitee_profile_id) THEN
         RAISE EXCEPTION 'Invitee profile not found';
-END IF;
+    END IF;
 
-SELECT id, price_id INTO inviter_subscription_id, inviter_price_id
-FROM public.subscriptions
-WHERE profile_id = inviter_profile_id
-ORDER BY start_date DESC LIMIT 1;
+    SELECT id, price_id INTO inviter_subscription_id, inviter_price_id
+    FROM public.subscriptions
+    WHERE profile_id = inviter_profile_id
+    ORDER BY start_date DESC LIMIT 1;
 
-SELECT id, price_id INTO invitee_subscription_id, invitee_price_id
-FROM public.subscriptions
-WHERE profile_id = invitee_profile_id
-ORDER BY start_date DESC LIMIT 1;
+    SELECT id, price_id INTO invitee_subscription_id, invitee_price_id
+    FROM public.subscriptions
+    WHERE profile_id = invitee_profile_id
+    ORDER BY start_date DESC LIMIT 1;
 
-IF inviter_subscription_id IS NULL OR invitee_subscription_id IS NULL THEN
+    IF inviter_subscription_id IS NULL OR invitee_subscription_id IS NULL THEN
         RAISE EXCEPTION 'One or both profiles do not have active subscriptions';
-END IF;
+    END IF;
 
     IF inviter_price_id >= 2 AND invitee_price_id >= 2 THEN
-UPDATE public.subscriptions
-SET price_id = price_id - 2
-WHERE id = inviter_subscription_id;
+        UPDATE public.subscriptions
+        SET price_id = price_id - 2
+        WHERE id = inviter_subscription_id;
 
-UPDATE public.subscriptions
-SET price_id = price_id - 2
-WHERE id = invitee_subscription_id;
-ELSE
+        UPDATE public.subscriptions
+        SET price_id = price_id - 2
+        WHERE id = invitee_subscription_id;
+    ELSE
         RAISE EXCEPTION 'One or both subscriptions are not eligible for a discount';
-END IF;
+    END IF;
 END;
 $$;
 ----------------------
@@ -534,33 +525,33 @@ CREATE OR REPLACE PROCEDURE update_user_credentials(
     new_email VARCHAR,
     new_password VARCHAR
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-existing_user_id UUID;
+    existing_user_id UUID;
     existing_is_banned BOOLEAN;
 BEGIN
-SELECT id, is_banned INTO existing_user_id, existing_is_banned
-FROM public.users
-WHERE id = user_id;
+    SELECT id, is_banned INTO existing_user_id, existing_is_banned
+    FROM public.users
+    WHERE id = user_id;
 
-IF existing_user_id IS NULL THEN
+    IF existing_user_id IS NULL THEN
         RAISE EXCEPTION 'User with id % not found', user_id;
-END IF;
+    END IF;
 
     IF existing_is_banned THEN
         RAISE EXCEPTION 'User with id % is banned', user_id;
-END IF;
+    END IF;
 
-UPDATE public.users
-SET
-    email = COALESCE(new_email, email),
-    password = COALESCE(new_password, password)
-WHERE id = user_id;
+    UPDATE public.users
+    SET
+        email = COALESCE(new_email, email),
+        password = COALESCE(new_password, password)
+    WHERE id = user_id;
 
-IF NOT FOUND THEN
+    IF NOT FOUND THEN
         RAISE EXCEPTION 'Failed to update user with id %', user_id;
-END IF;
+    END IF;
 
 END;
 $$;
@@ -569,33 +560,33 @@ CREATE OR REPLACE PROCEDURE create_referral(
     host_user_id UUID,
     invited_user_id UUID
 )
-LANGUAGE plpgsql
+    LANGUAGE plpgsql
 AS $$
 DECLARE
-host_user_has_used_referral BOOLEAN;
+    host_user_has_used_referral BOOLEAN;
     invited_user_exists BOOLEAN;
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM public.users WHERE id = host_user_id) THEN
         RAISE EXCEPTION 'Requested host was not found';
-END IF;
+    END IF;
 
     IF NOT EXISTS (SELECT 1 FROM public.users WHERE id = invited_user_id) THEN
         RAISE EXCEPTION 'Requested user to invite was not found';
-END IF;
+    END IF;
 
-SELECT has_used_referral_link INTO host_user_has_used_referral
-FROM public.users WHERE id = host_user_id;
+    SELECT has_used_referral_link INTO host_user_has_used_referral
+    FROM public.users WHERE id = host_user_id;
 
-IF host_user_has_used_referral THEN
+    IF host_user_has_used_referral THEN
         RAISE EXCEPTION 'Referral link had been used';
-END IF;
+    END IF;
 
-INSERT INTO public.referral (id, host_id, invited_id)
-VALUES (nextval('public.referral_seq'), host_user_id, invited_user_id);
+    INSERT INTO public.referral (id, host_id, invited_id)
+    VALUES (nextval('public.referral_seq'), host_user_id, invited_user_id);
 
-UPDATE public.users
-SET has_used_referral_link = TRUE
-WHERE id = host_user_id;
+    UPDATE public.users
+    SET has_used_referral_link = TRUE
+    WHERE id = host_user_id;
 
 END;
 $$;
@@ -670,7 +661,28 @@ BEGIN
     RAISE NOTICE 'Profile % updated successfully.', profile_id_field;
 END;
 $$;
-
-
+----------------------
+CREATE OR REPLACE PROCEDURE register_user(
+    IN email_in VARCHAR(255),
+    IN password_in VARCHAR(255),
+    IN token_in VARCHAR(512)
+)
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    new_user_id uuid;
+BEGIN
+    IF EXISTS (SELECT 1 FROM users WHERE email = email_in) THEN
+        RAISE EXCEPTION 'Email is already taken';
+    ELSE
+        new_user_id := uuid_generate_v4();
+        INSERT INTO public.users (id, email, password, token, is_banned, has_used_referral_link)
+        VALUES (new_user_id, email_in, password_in, token_in, false, false);
+        INSERT INTO warnings (user_id, login_faults)
+        VALUES (new_user_id, 0);
+    END IF;
+END;
+$$;
+----------------------
 
 

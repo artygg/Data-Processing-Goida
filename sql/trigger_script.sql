@@ -6,9 +6,9 @@ RETURNS TRIGGER AS
 $$
 BEGIN
     IF NEW.login_faults >= 3 THEN
-        NEW.block_end := NOW() + INTERVAL '1 day';
+        NEW.ban_end_date := NOW() + INTERVAL '1 day';
     ELSE
-        NEW.block_end := NULL;
+        NEW.ban_end_date := NULL;
     END IF;
     RETURN NEW;
 END;

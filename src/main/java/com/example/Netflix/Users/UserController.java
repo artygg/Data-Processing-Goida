@@ -36,17 +36,9 @@ public class UserController {
                     .body(new ResponseMessage("Email is already taken"));
         }
 
-        User user = new User();
         String jwt = jwtTokenFactory.generateToken(email);
-        Warning warning = new Warning();
 
-        user.setEmail(email);
-        user.setPassword(userRequestBody.getPassword());
-        user.setToken(jwt);
-        user.setWarning(warning);
-        warning.setUser(user);
-
-        userService.saveUser(user);
+        userService.registration(email, userRequestBody.getPassword(), jwt);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseMessage("User was registered successfully"));
     }
