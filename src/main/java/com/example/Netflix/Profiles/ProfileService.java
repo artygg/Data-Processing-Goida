@@ -1,5 +1,6 @@
 package com.example.Netflix.Profiles;
 
+import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.Preferences.PreferencesRequest;
 import com.example.Netflix.Users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,7 +59,7 @@ public class ProfileService {
 
             return ResponseEntity.ok(profileRepository.findProfileById(profileId));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         }
     }
 
@@ -67,7 +69,7 @@ public class ProfileService {
 
             return ResponseEntity.ok(profileRepository.findProfileById(profileId));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         }
     }
 
@@ -77,7 +79,7 @@ public class ProfileService {
 
             return ResponseEntity.ok(profileRepository.findProfileById(profileId));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         }
     }
 
@@ -87,7 +89,7 @@ public class ProfileService {
 
             return ResponseEntity.ok(userService.findUserByUserId(userId));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         }
     }
 }

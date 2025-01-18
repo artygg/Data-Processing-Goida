@@ -1,5 +1,6 @@
 package com.example.Netflix.Subscriptions;
 
+import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.Subscriptions.RequestBody.UsersIdBody;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class SubscriptionController {
 
             return ResponseEntity.ok(trial);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ResponseMessage("Bad request"));
         }
     }
 
@@ -47,7 +48,7 @@ public class SubscriptionController {
             Subscription subscription = subscriptionService.createSubscription(subscriptionBody.getProfile(), subscriptionBody.getPriceId(), start, end);
             return ResponseEntity.ok(subscription);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ResponseMessage("Bad request"));
         }
     }
 
@@ -59,7 +60,7 @@ public class SubscriptionController {
             subscriptionService.applyDiscountForInvitation(usersIdBody.getInviterProfileId(), usersIdBody.getInviteeProfileId());
             return ResponseEntity.ok("Discount applied successfully if eligible.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ResponseMessage("Bad request"));
         }
     }
 

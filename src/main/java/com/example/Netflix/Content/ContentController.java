@@ -3,16 +3,11 @@ package com.example.Netflix.Content;
 import com.example.Netflix.Exceptions.ResourceNotFoundException;
 import com.example.Netflix.Generalization.BaseController;
 import com.example.Netflix.Generalization.BaseService;
-import com.example.Netflix.Generalization.BaseServiceInterface;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
+import com.example.Netflix.JSON.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,55 +39,77 @@ public class ContentController extends BaseController<Content, Long> {
 
     @GetMapping(value = "/series/{seriesId}/episodes", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getEpisodesBySeriesId(@PathVariable Integer seriesId) {
-        return contentService.getEpisodesBySeriesId(seriesId);
+        try {
+            return contentService.getEpisodesBySeriesId(seriesId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
+
     }
 
     @GetMapping(value = "/genre/{genreName}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getContentsByGenre(@PathVariable String genreName) {
-        return contentService.getContentsByGenre(genreName);
+        try {
+            return contentService.getContentsByGenre(genreName);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
     }
 
     @GetMapping(value = "/resolution/{resolutionId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getContentsByResolution(@PathVariable Long resolutionId) {
-        return contentService.getContentsByResolution(resolutionId);
+        try {
+            return contentService.getContentsByResolution(resolutionId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
     }
 
     @PostMapping("/series/{seriesId}/episodes")
     public ResponseEntity<?> addEpisodeToSeries(@PathVariable Integer seriesId, @RequestBody Content episode) {
         try {
             contentService.addEpisodeToSeries(seriesId, episode);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Episode added to series.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         }
+        return ResponseEntity.status(HttpStatus.CREATED).body("Episode added to series.");
     }
 
     @PostMapping("/{contentId}/genres/{genreId}")
     public ResponseEntity<?> addGenreToContent(@PathVariable Long contentId, @PathVariable Long genreId) throws ResourceNotFoundException {
-        contentService.addGenreToContent(contentId, genreId);
-
-        return ResponseEntity.ok("Genre added to content.");
+        try {
+            return contentService.addGenreToContent(contentId, genreId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
     }
 
     @DeleteMapping("/{contentId}/genres/{genreId}")
     public ResponseEntity<?> removeGenreFromContent(@PathVariable Long contentId, @PathVariable Long genreId) throws ResourceNotFoundException {
-        contentService.removeGenreFromContent(contentId, genreId);
-
+        try {
+            contentService.removeGenreFromContent(contentId, genreId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
         return ResponseEntity.ok("Genre removed from content.");
     }
 
     @PostMapping("/{contentId}/resolutions/{resolutionId}")
     public ResponseEntity<?> addResolutionToContent(@PathVariable Long contentId, @PathVariable Long resolutionId) throws ResourceNotFoundException {
-        contentService.addResolutionToContent(contentId, resolutionId);
-
-        return ResponseEntity.ok("Resolution added to content.");
+        try {
+            return contentService.addResolutionToContent(contentId, resolutionId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
     }
 
     @DeleteMapping("/{contentId}/resolutions/{resolutionId}")
     public ResponseEntity<?> removeResolutionFromContent(@PathVariable Long contentId, @PathVariable Long resolutionId) throws ResourceNotFoundException {
-        contentService.removeResolutionFromContent(contentId, resolutionId);
-
+        try {
+            contentService.removeResolutionFromContent(contentId, resolutionId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
         return ResponseEntity.ok("Resolution removed from content.");
     }
 }

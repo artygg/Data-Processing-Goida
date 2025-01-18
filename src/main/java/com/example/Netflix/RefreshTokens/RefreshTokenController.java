@@ -2,6 +2,7 @@ package com.example.Netflix.RefreshTokens;
 
 import com.example.Netflix.ApiUsers.ApiUser;
 import com.example.Netflix.ApiUsers.ApiUserService;
+import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.JWT.JwtTokenFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,7 +34,7 @@ public class RefreshTokenController {
         Optional<RefreshToken> optionalRefreshToken = refreshTokenService.findRefreshTokenByToken(refreshTokenDTO.getToken());
 
         if (optionalRefreshToken.isEmpty() || refreshTokenService.isRefreshedTokenExpired(optionalRefreshToken.get())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token was not found or expired");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Refresh token was not found or expired"));
         } else {
             RefreshToken refreshToken = optionalRefreshToken.get();
             String newJwt = jwtTokenFactory.generateToken(refreshToken.getUsername());
@@ -45,7 +46,7 @@ public class RefreshTokenController {
                 apiUser.setToken(newJwt);
                 apiUserService.updateSystemUser(apiUser);
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Api user was not found");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("API user was not found"));
             }
 
             return ResponseEntity.ok()

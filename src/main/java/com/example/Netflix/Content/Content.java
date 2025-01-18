@@ -4,8 +4,6 @@ import com.example.Netflix.Deserializer.StatusDeserializer;
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.enums.ContentType;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +12,6 @@ import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "contents")

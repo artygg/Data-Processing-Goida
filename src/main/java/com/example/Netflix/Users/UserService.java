@@ -35,7 +35,7 @@ public class UserService {
 
             userRepository.registerUser(email, hashedPassword, token);
         } catch (Exception e) {
-            throw new RuntimeException("Failed registration of a user: " + e.getMessage());
+            throw new RuntimeException("Failed registration of a user");
         }
     }
 
@@ -50,7 +50,7 @@ public class UserService {
             return ResponseEntity.ok(userRequestBody);
         } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseMessage("An error occurred: " + e.getMessage()));
+                        .body(new ResponseMessage("Internal server error"));
         }
     }
 

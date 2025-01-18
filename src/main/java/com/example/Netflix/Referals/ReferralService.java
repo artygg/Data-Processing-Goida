@@ -45,7 +45,7 @@ public class ReferralService extends BaseService<Referral, Long> {
             return ResponseEntity.ok(new ResponseMessage("Referral was successfully saved"));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("An error occurred: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 }

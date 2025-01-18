@@ -4,6 +4,7 @@ import com.example.Netflix.Exceptions.ResourceNotFoundException;
 import com.example.Netflix.Generalization.BaseService;
 import com.example.Netflix.Genre.Genre;
 import com.example.Netflix.Genre.GenreRepository;
+import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.Resolutions.Resolution;
 import com.example.Netflix.Resolutions.ResolutionRepository;
 import com.example.Netflix.enums.ContentType;
@@ -83,13 +84,18 @@ public class ContentService extends BaseService<Content, Long> {
         return contentRepository.findById(id);
     }
 
-    public void addGenreToContent(Long contentId, Long genreId) throws ResourceNotFoundException
+    public ResponseEntity<?> addGenreToContent(Long contentId, Long genreId) throws ResourceNotFoundException
     {
         Content content = getContentById(contentId);
         Genre genre = genreRepository.findById(genreId)
                 .orElseThrow(() -> new ResourceNotFoundException("Genre not found"));
         content.getGenres().add(genre);
-        contentRepository.save(content);
+        try {
+            contentRepository.save(content);
+            return ResponseEntity.status(HttpStatus.CREATED).body(content);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
     }
 
     public void removeGenreFromContent(Long contentId, Long genreId) throws ResourceNotFoundException
@@ -101,13 +107,19 @@ public class ContentService extends BaseService<Content, Long> {
         contentRepository.save(content);
     }
 
-    public void addResolutionToContent(Long contentId, Long resolutionId) throws ResourceNotFoundException
+    public ResponseEntity<?> addResolutionToContent(Long contentId, Long resolutionId) throws ResourceNotFoundException
     {
         Content content = getContentById(contentId);
         Resolution resolution = resolutionRepository.findById(Math.toIntExact(resolutionId))
                 .orElseThrow(() -> new ResourceNotFoundException("Resolution not found with ID: " + resolutionId));
         content.getResolutions().add(resolution);
-        contentRepository.save(content);
+
+        try {
+            contentRepository.save(content);
+            return ResponseEntity.ok(content);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
+        }
     }
 
     public void removeResolutionFromContent(Long contentId, Long resolutionId) throws ResourceNotFoundException

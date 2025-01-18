@@ -8,9 +8,10 @@ import java.util.UUID;
 public class ProfileDTO {
     @NotNull
     private UUID userID;
+    @NotBlank(message = "Language is required")
     private String language;
-    @NotBlank(message = "Profile name is required")
     private String profileName;
+    @NotBlank(message = "Profile image is required")
     private String profilePhoto;
     private String age;
 

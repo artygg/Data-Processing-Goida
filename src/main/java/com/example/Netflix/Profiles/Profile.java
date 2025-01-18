@@ -25,13 +25,17 @@ public class Profile {
     @JsonBackReference
     private User user;
 
-    @NotBlank(message = "Profile name is required")
-    @Pattern(regexp = "^[a-zA-Z0-9.!?\" ]+$", message = "Profile name format is invalid")
+    // @NotBlank(message = "Profile name is required")
+    //@Pattern(regexp = "^[a-zA-Z0-9.!?\" ]+$", message = "Profile name format is invalid")
+    // if ProfilePhoto is not provided, it is set from the external API, so the checks are not used
     private String profileName;
 
+    @NotBlank(message = "Profile image is required")
     private String profilePhoto;
+    @NotBlank(message = "Age is required")
     private LocalDate age;
 
+    @NotBlank(message = "Language is required")
     @Enumerated(EnumType.STRING)
     @Pattern(regexp = "^[a-zA-Z]+$", message = "Language format is invalid")
     private Language language;

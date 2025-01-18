@@ -6,6 +6,7 @@ import com.example.Netflix.Exceptions.ProfileLimitReached;
 import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.Preferences.PreferencesRequest;
 
+import com.example.Netflix.enums.Language;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -24,7 +26,8 @@ public class ProfileController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createProfile(@RequestBody @Valid ProfileDTO profileBody) throws ProfileLimitReached {
+    public ResponseEntity<?> createProfile(@RequestBody @Valid ProfileDTO profileBody) throws IOException
+    {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
             if (username == null || username.isEmpty()) {
@@ -34,6 +37,13 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized request"));
         }
 
+        if (profileBody.getProfileName() == null || profileBody.getProfileName().isEmpty()) {
+            try {
+                profileBody.setProfileName(RandomNicknameService.getRandomUsername());
+            } catch (IOException e) {
+                profileBody.setProfileName("NetflixProfile"+ new Random().nextInt(10000));
+            }
+        }
         return profileService.createProfile(profileBody.getUserID(), profileBody.getProfileName(), profileBody.getProfilePhoto(), profileBody.getAge(), profileBody.getLanguage());
     }
 
@@ -52,8 +62,8 @@ public class ProfileController {
 
             return ResponseEntity.ok(profile);
         }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Requested profile does not exist");
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Profile does not exist"));
     }
 
     @PutMapping(value = "/{id}",
@@ -95,7 +105,7 @@ public class ProfileController {
             return ResponseEntity.ok(profile.getWatchLater());
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile was not found");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Profile does not exist"));
     }
 
     @PutMapping("/{id}/watch-later")
@@ -114,7 +124,7 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile was not found");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Profile does not exist"));
     }
 
     @DeleteMapping("/{id}/watch-later/{contentId}")

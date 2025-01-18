@@ -2,6 +2,7 @@ package com.example.Netflix.Referals;
 
 import com.example.Netflix.Generalization.BaseController;
 import com.example.Netflix.Generalization.BaseService;
+import com.example.Netflix.JSON.ResponseMessage;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class ReferralController extends BaseController<Referral, Long> {
         try {
             return ResponseEntity.ok(referralService.getReferralByInvitedId(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 }

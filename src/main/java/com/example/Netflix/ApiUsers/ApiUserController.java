@@ -72,7 +72,7 @@ public class ApiUserController {
                 } catch (BadCredentialsException e) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Wrong credentials"));
                 } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal Server Error"));
                 }
         }
 
@@ -95,10 +95,10 @@ public class ApiUserController {
                 refreshTokenService.deleteRefreshTokenByToken(refreshTokenDTO.getToken());
                 apiUserService.updateSystemUser(apiUser);
 
-                return ResponseEntity.ok("Successfully logged out");
+                return ResponseEntity.ok(new ResponseMessage("Logged "));
             }
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized"));
     }
 }

@@ -1,6 +1,7 @@
 package com.example.Netflix.Subtitle;
 import java.util.List;
 
+import com.example.Netflix.JSON.ResponseMessage;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,12 +26,12 @@ public class SubtitleController {
         try {
             List<Subtitle> subtitles = subtitleService.getSubtitlesByContentId(contentId);
             if (subtitles.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No subtitles found for content ID: " + contentId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage("No subtitles found for content ID: \" + contentId"));
             }
 
             return ResponseEntity.ok(subtitles);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving subtitles: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 
@@ -43,11 +44,11 @@ public class SubtitleController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(createdSubtitle);
         } catch (ClassCastException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: Authentication failed.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized request: Authentication failed."));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid subtitle data: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating subtitle: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 
@@ -59,11 +60,11 @@ public class SubtitleController {
 
             return ResponseEntity.noContent().build();
         } catch (ClassCastException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: Authentication failed.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized request: Authentication failed."));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request parameters: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting subtitle: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 }

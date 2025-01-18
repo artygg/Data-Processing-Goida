@@ -1,5 +1,6 @@
 package com.example.Netflix.Generalization;
 
+import com.example.Netflix.JSON.ResponseMessage;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -42,16 +43,16 @@ public abstract class BaseController<T, ID> {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized request: User not authenticated"));
             }
 
             T createdEntity = getService().create(entity);
 
             return ResponseEntity.status(201).body(createdEntity);
         } catch (ConstraintViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage("Bad request"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 
@@ -62,14 +63,14 @@ public abstract class BaseController<T, ID> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized request: User not authenticated"));
             }
 
             T updatedEntity = getService().update(id, entity);
 
             return ResponseEntity.ok(updatedEntity);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating content: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("Internal server error"));
         }
     }
 
@@ -82,7 +83,7 @@ public abstract class BaseController<T, ID> {
 
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage("Unauthorized request: User not authenticated"));
         }
     }
 }
