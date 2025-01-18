@@ -151,29 +151,24 @@ DECLARE
     existing_user_id UUID;
     existing_is_banned BOOLEAN;
 BEGIN
-    -- Fetch user data, including banned status, in one go
     SELECT id, is_banned INTO existing_user_id, existing_is_banned
     FROM public.users
     WHERE id = user_id;
 
-    -- Handle user not found scenario
     IF existing_user_id IS NULL THEN
         RAISE EXCEPTION 'User with id % not found', user_id;
     END IF;
 
-    -- Handle banned user scenario
     IF existing_is_banned THEN
         RAISE EXCEPTION 'User with id % is banned', user_id;
     END IF;
 
-    -- Update user credentials if user is found and not banned
     UPDATE public.users
     SET
         email = COALESCE(new_email, email),
         password = COALESCE(new_password, password)
     WHERE id = user_id;
 
-    -- Optionally, check the number of rows affected to handle updates
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Failed to update user with id %', user_id;
     END IF;
@@ -191,25 +186,21 @@ DECLARE
     profile_exists BOOLEAN;
     content_exists BOOLEAN;
 BEGIN
-    -- Check if profile exists
     SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id_in) INTO profile_exists;
 
     IF NOT profile_exists THEN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id_in;
     END IF;
 
-    -- Check if content exists
     SELECT EXISTS (SELECT 1 FROM public.contents WHERE id = content_id_in) INTO content_exists;
 
     IF NOT content_exists THEN
         RAISE EXCEPTION 'Content with ID % not found', content_id_in;
     END IF;
 
-    -- Delete the entry from profiles_watch_later table
     DELETE FROM public.profiles_watch_later
     WHERE profile_id = profile_id_in AND profiles_watch_later.watch_later_content_id = content_id_in;
 
-    -- Optionally, you can return a success message
     RAISE NOTICE 'Successfully removed content with ID % from watch later list.', content_id_in;
 END;
 $$;
@@ -228,7 +219,6 @@ DECLARE
     existing_profile RECORD;
     valid_language BOOLEAN;
 BEGIN
-    -- Check if the profile exists
     SELECT * INTO existing_profile
     FROM public.profiles
     WHERE id = profile_id;
@@ -237,7 +227,6 @@ BEGIN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id;
     END IF;
 
-    -- Update the profile fields if new values are provided
     UPDATE public.profiles
     SET
         profile_name = COALESCE(NULLIF(new_profile_name, ''), profile_name),
@@ -273,7 +262,6 @@ DECLARE
     is_child BOOLEAN;
     calculated_age INT;
 BEGIN
-    -- Check if the profile exists
     SELECT * INTO existing_profile
     FROM public.profiles
     WHERE user_id = user_id_field;
@@ -282,13 +270,11 @@ BEGIN
         RAISE EXCEPTION 'Profile with user ID % not found', user_id_field;
     END IF;
 
-    -- Handle age and calculate is_child
     IF new_age IS NULL THEN
         UPDATE public.profiles
         SET age = null
         WHERE user_id = user_id_field;
     ELSE
-        -- Calculate age in years
         calculated_age := DATE_PART('year', AGE(new_age));
         IF calculated_age < 18 AND calculated_age >= 0 THEN
             is_child := TRUE;
@@ -296,28 +282,24 @@ BEGIN
             is_child := FALSE;
         END IF;
 
-        -- Update age and is_child
         UPDATE public.profiles
         SET age = calculated_age,
             is_child = is_child
         WHERE user_id = user_id_field;
     END IF;
 
-    -- Update profile name if provided
     IF new_profile_name IS NOT NULL AND new_profile_name <> '' THEN
         UPDATE public.profiles
         SET profile_name = new_profile_name
         WHERE user_id = user_id_field;
     END IF;
 
-    -- Update profile photo if provided
     IF new_profile_photo IS NOT NULL AND new_profile_photo <> '' THEN
         UPDATE public.profiles
         SET profile_photo = new_profile_photo
         WHERE user_id = user_id_field;
     END IF;
 
-    -- Validate and update language
     valid_language := EXISTS (
         SELECT 1
         FROM unnest(ARRAY['ENGLISH', 'RUSSIAN', 'ARABIC', 'FRENCH', 'JAPANESE']) AS lang
@@ -347,18 +329,15 @@ AS $$
 DECLARE
     new_referral RECORD;
 BEGIN
-    -- Insert the new referral and capture the result in new_referral
     INSERT INTO public.referral (id, host_id, invited_id)
     VALUES (nextval('referral_id_seq'), host_id_out, invited_id_out)
     RETURNING id, host_id, invited_id INTO new_referral;
 
-    -- Notify of successful referral insertion
     RAISE NOTICE 'Referral saved successfully with ID: %, Host ID: %, Invited ID: %',
         new_referral.id, new_referral.host_id, new_referral.invited_id;
 
 EXCEPTION
     WHEN OTHERS THEN
-        -- Handle errors
         RAISE EXCEPTION 'Error saving referral: %', SQLERRM;
 END;
 $$;
@@ -396,13 +375,11 @@ CREATE OR REPLACE PROCEDURE get_resolution_by_id(
 AS
 $$
 BEGIN
-    -- Explicitly qualify the table column with the table name
     SELECT r.resolution_id, r.name
     INTO resolution_id_out, name_out
     FROM public.resolution r
     WHERE r.resolution_id = resolution_id_param;
 
-    -- Check if no rows were found
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Resolution with id % not found', resolution_id_param;
     END IF;
@@ -442,31 +419,25 @@ DECLARE
     profile_exists BOOLEAN;
     price_amount DOUBLE PRECISION;
 BEGIN
-    -- Profile check
     SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = profile_id) INTO profile_exists;
     IF NOT profile_exists THEN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id;
     END IF;
 
-    -- Price validation
     SELECT price INTO price_amount FROM public.price WHERE id = price_id;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Price not found for the given price_id: %', price_id;
     END IF;
 
-    -- Date validation
     IF end_date_insert <= start_date_insert THEN
         RAISE EXCEPTION 'End date must be after the start date';
     END IF;
 
-    -- Insert subscription
     INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
     VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id);
 
-    -- Output cost
     subscription_cost := price_amount;
 
-    -- Output notice
     RAISE NOTICE 'Subscription created successfully for Profile ID: %, Cost: %', profile_id, subscription_cost;
 END;
 $$;
@@ -594,7 +565,7 @@ $$;
 CREATE OR REPLACE PROCEDURE update_profile_preferences(
     profile_id_field UUID,
     classifications TEXT[],
-    genres TEXT[],  -- Assuming genres are passed as TEXT[]
+    genres TEXT[],
     interested_in_films BOOLEAN,
     interested_in_series BOOLEAN,
     interested_in_films_with_min_age BOOLEAN
@@ -604,17 +575,15 @@ AS $$
 DECLARE
     profile_exists BOOLEAN;
     converted_classifications TEXT[];
-    genre JSONB;  -- Declare genre as JSONB to handle it as JSONB object
+    genre JSONB;
     preference_id INT;
 BEGIN
-    -- Check if the profile exists
     SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = profile_id_field) INTO profile_exists;
 
     IF NOT profile_exists THEN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id_field;
     END IF;
 
-    -- Convert classifications to uppercase if present
     IF classifications IS NOT NULL AND array_length(classifications, 1) > 0 THEN
         converted_classifications := ARRAY(
                 SELECT UPPER(classification)
@@ -624,7 +593,6 @@ BEGIN
         converted_classifications := NULL;
     END IF;
 
-    -- Update preferences for the profile
     UPDATE public.preferences
     SET
         is_interested_in_films = interested_in_films,
@@ -632,32 +600,26 @@ BEGIN
         is_interested_in_series = interested_in_series
     WHERE profile_id = profile_id_field;
 
-    -- Get preference ID
     SELECT id
     INTO preference_id
     FROM public.preferences
     WHERE profile_id = profile_id_field;
 
-    -- Delete old genres for the profile
     DELETE FROM public.preferences_genres WHERE preferences_id = preference_id;
 
-    -- Insert new genres
     IF genres IS NOT NULL THEN
         FOREACH genre IN ARRAY genres
             LOOP
-                -- Cast each text genre to JSONB for extracting 'id' and 'name'
-                genre := genre::JSONB;  -- Convert genre from text to JSONB
-                -- Extract 'id' and 'name' from the genre JSONB object
+                genre := genre::JSONB;
                 INSERT INTO public.preferences_genres (preferences_id, genres, genres_id)
                 VALUES (
-                           preference_id,          -- Use the preference_id for the preferences_id
-                           genre->>'name',         -- Extract genre 'name' as text
-                           (genre->>'id')::bigint     -- Extract genre 'id' and cast it to INT
+                           preference_id,
+                           genre->>'name',
+                           (genre->>'id')::bigint
                        );
             END LOOP;
     END IF;
 
-    -- Raise notice
     RAISE NOTICE 'Profile % updated successfully.', profile_id_field;
 END;
 $$;

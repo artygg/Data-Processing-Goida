@@ -51,21 +51,19 @@ public class Content
             joinColumns = @JoinColumn(name = "content_id"),
             inverseJoinColumns = @JoinColumn(name = "resolution_id")
     )
-    @JsonManagedReference
     private List<Resolution> resolutions;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "genre_contents",
             joinColumns = @JoinColumn(name = "content_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
-    @JsonManagedReference
-    private Set<Genre> genres;
+    private List<Genre> genres;
 
     public Content()
     {
     }
 
-    public Content(String title, String poster, String description, String videoLink, Double duration, ContentType type, Integer season, Integer episodeNumber, Integer seriesId, LocalDateTime updatedAt, LocalDateTime createdAt, List<Resolution> resolutions, Set<Genre> genres)
+    public Content(String title, String poster, String description, String videoLink, Double duration, ContentType type, Integer season, Integer episodeNumber, Integer seriesId, LocalDateTime updatedAt, LocalDateTime createdAt, List<Resolution> resolutions, List<Genre> genres)
     {
         this.setTitle(title);
         this.setPoster(poster);
@@ -257,11 +255,11 @@ public class Content
         this.resolutions = resolutions;
     }
 
-    public Set<Genre> getGenres() {
+    public List<Genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(Set<Genre> genres) {
+    public void setGenres(List<Genre> genres) {
         this.genres = genres;
     }
 }

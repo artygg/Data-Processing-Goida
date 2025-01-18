@@ -2,6 +2,7 @@ package com.example.Netflix.Resolutions;
 
 import com.example.Netflix.Content.Content;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -18,8 +19,13 @@ public class Resolution {
     @NotNull(message = "Name is required")
     private String name;
     @NotNull(message = "Content is required")
-    @ManyToMany(mappedBy = "resolutions")
-    @JsonBackReference
+    @ManyToMany()
+    @JoinTable(
+            name = "quality_ranges",
+            joinColumns = @JoinColumn(name = "resolution_id"),
+            inverseJoinColumns = @JoinColumn(name = "content_id")
+    )
+    @JsonIgnore
     private List<Content> contents;
 
     public Resolution() {

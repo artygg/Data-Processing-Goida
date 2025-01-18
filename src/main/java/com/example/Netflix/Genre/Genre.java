@@ -2,10 +2,12 @@ package com.example.Netflix.Genre;
 
 import com.example.Netflix.Content.Content;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,8 +22,8 @@ public class Genre {
 
     @ManyToMany(mappedBy = "genres")
     @NotBlank(message = "Content is required")
-    @JsonBackReference
-    private Set<Content> contents;
+    @JsonIgnore
+    private List<Content> contents;
 
     public Genre() {
     }
@@ -32,12 +34,12 @@ public class Genre {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Set<Content> getContents()
+    public List<Content> getContents()
     {
         return contents;
     }
 
-    public void setContents(Set<Content> contents)
+    public void setContents(List<Content> contents)
     {
         this.contents = contents;
     }
