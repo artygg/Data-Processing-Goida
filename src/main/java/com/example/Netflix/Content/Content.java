@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,19 +25,22 @@ public class Content
     @Column(name = "content_id")
     private Long id;
     @NotBlank(message = "Title is required")
+    @Pattern(regexp = "^[a-zA-Z0-9 ]+$", message = "Title must contain only letters and numbers")
     private String title;
     @NotBlank(message = "Poster is required")
     private String poster;
     @NotBlank(message = "Description is required")
+    @Pattern(regexp = "^[a-zA-Z0-9.!?\" ]+$", message = "Description format is invalid")
     private String description;
     @NotBlank(message = "Video link is required")
     private String videoLink;
-    @NotNull
+    @NotNull(message = "Duration is required")
+    @Pattern(regexp = "^[0-9.,]+$", message = "Duration format is invalid")
     private Double duration;
 
     @JsonDeserialize(using = StatusDeserializer.class)
     @Enumerated(EnumType.STRING)
-    @NotNull
+    @NotNull(message = "Content type is required")
     private ContentType type;
 
     private Integer season;

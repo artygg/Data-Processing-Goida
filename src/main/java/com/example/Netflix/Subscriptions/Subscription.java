@@ -17,19 +17,19 @@ public class Subscription {
 
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
-    @NotNull
+    @NotNull(message = "Profile is required")
     private Profile profile;
 
     @Column(name = "price_id", nullable = false)
-    @NotNull
+    @NotNull(message = "Price id is required")
     private Integer priceId;
 
     @Column(name = "start_date", nullable = false)
-    @NotNull
+    @NotNull(message = "Start date is required")
     private Date startDate;
 
     @Column(name = "end_date")
-    @NotNull
+    @NotNull(message = "End date is required")
     private Date endDate;
 
     public Subscription() {

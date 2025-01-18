@@ -11,10 +11,10 @@ public class Referral {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotNull
+    @NotNull(message = "Host id is required")
     @Column(name = "host_id")
     private UUID hostId;
-    @NotNull
+    @NotNull(message = "Invited user id is required")
     @Column(name = "invited_id")
     private UUID invitedId;
 

@@ -4,8 +4,10 @@ import com.example.Netflix.Content.Content;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 import java.util.Set;
@@ -18,11 +20,12 @@ public class Genre {
     private Long id;
 
     @NotBlank(message = "Name is required")
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "Genre name must contain only letters")
     private String name;
 
     @ManyToMany(mappedBy = "genres")
     @NotBlank(message = "Content is required")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Content> contents;
 
     public Genre() {
@@ -43,7 +46,6 @@ public class Genre {
     {
         this.contents = contents;
     }
-
 
     @Override
     public String toString() {

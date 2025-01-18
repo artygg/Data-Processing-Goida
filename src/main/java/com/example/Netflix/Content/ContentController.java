@@ -87,10 +87,7 @@ public class ContentController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized request: User not authenticated");
             }
 
-            ResponseEntity<?> responseEntity = contentService.updateContent(id, updatedContent);
-
-            return responseEntity;
-
+            return ResponseEntity.ok(contentService.updateContent(id, updatedContent));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating content: " + e.getMessage());
         }

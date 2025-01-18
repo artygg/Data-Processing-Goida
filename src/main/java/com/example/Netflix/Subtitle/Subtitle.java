@@ -4,6 +4,7 @@ import com.example.Netflix.Content.Content;
 import com.example.Netflix.enums.Language;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @IdClass(SubtitleId.class)
@@ -17,6 +18,7 @@ public class Subtitle {
     @Column(name = "language")
     @Enumerated(EnumType.STRING)
     @NotBlank(message = "Language is require")
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "Language must contain only letters")
     private Language language;
 
     @ManyToOne

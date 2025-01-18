@@ -8,6 +8,7 @@ import com.example.Netflix.enums.Language;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,10 +23,13 @@ public class Profile {
     @ManyToOne
     @JsonBackReference
     private User user;
+    @NotBlank(message = "Profile name is required")
+    @Pattern(regexp = "^[a-zA-Z0-9.!?\" ]+$", message = "Profile name format is invalid")
     private String profileName;
     private String profilePhoto;
     private LocalDate age;
     @Enumerated(EnumType.STRING)
+    @Pattern(regexp = "^[a-zA-Z]+$", message = "Language format is invalid")
     private Language language;
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private Preferences preferences;

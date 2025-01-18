@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class Price {
     @Id
     private Integer id;
     @NotBlank(message = "Price is required")
+    @Pattern(regexp = "^[0-9.,]+$", message = "Price format is invalid")
     private double price;
     @OneToMany
     @NotBlank(message = "Resolutions are required")
