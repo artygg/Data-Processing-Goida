@@ -10,4 +10,7 @@
     <file url="file://$PROJECT_DIR$/src/main/java/com/example/Netflix/Subscriptions/SubscriptionRepository.java" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/example/Netflix/Users/UserRepository.java" dialect="PostgreSQL" />
   </component>
+  <component name="SqlResolveMappings">
+    <file url="file://$PROJECT_DIR$/sql/stored_procedures.sql" scope="{&quot;node&quot;:{  &quot;@negative&quot;:&quot;1&quot;,  &quot;group&quot;:{   &quot;@kind&quot;:&quot;root&quot;,   &quot;node&quot;:{    &quot;name&quot;:{     &quot;@qname&quot;:&quot;4567dc6c-eb51-40ce-ae71-dbea6efc445a&quot;    },    &quot;group&quot;:{     &quot;@kind&quot;:&quot;database&quot;,     &quot;node&quot;:{      &quot;name&quot;:{       &quot;@qname&quot;:&quot;Netflix&quot;      },      &quot;name&quot;:{       &quot;@qname&quot;:&quot;postgres&quot;      }     }    }   }  } }}" />
+  </component>
 </project>

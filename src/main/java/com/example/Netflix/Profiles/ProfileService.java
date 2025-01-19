@@ -85,7 +85,7 @@ public class ProfileService {
 
     public ResponseEntity<?> createProfile(UUID userId, String profileName, String profilePhoto, String age, String language) {
         try {
-            profileRepository.createProfile(userId, profileName, profilePhoto, age != null ? Date.valueOf(age) : null, language);
+            profileRepository.createProfile(userId, profileName, profilePhoto, age != null ? LocalDate.parse(age) : null, language);
 
             return ResponseEntity.ok(userService.findUserByUserId(userId));
         } catch (Exception e) {

@@ -1,11 +1,5 @@
 REVOKE INSERT, UPDATE, DELETE ON TABLE Users, profiles, Subscriptions, contents FROM PUBLIC;
 
-GRANT EXECUTE ON PROCEDURE
-    sp_admin_create_user(VARCHAR, VARCHAR, BOOLEAN),
-    sp_admin_update_user(INT, VARCHAR, VARCHAR, BOOLEAN),
-    sp_admin_delete_user(INT)
-TO app_admin;
-
 CREATE OR REPLACE PROCEDURE sp_create_content (
     p_title        VARCHAR(255),
     p_poster       VARCHAR(255),
@@ -25,7 +19,7 @@ DECLARE
 BEGIN
     INSERT INTO contents (title, poster, description, video_link, duration, type, season, episode_number, series_id)
     VALUES (p_title, p_poster, p_description, p_video_link, p_duration, p_type, p_season, p_episode_num, p_series_id)
-    RETURNING id INTO v_new_id;
+    RETURNING content_id INTO v_new_id;
 
     RAISE NOTICE 'Content created with id %', v_new_id;
 END;
@@ -39,7 +33,7 @@ CREATE OR REPLACE PROCEDURE sp_delete_content (
 AS $$
 BEGIN
     DELETE FROM contents
-    WHERE id = p_content_id;
+    WHERE content_id = p_content_id;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Content with id % not found', p_content_id;
@@ -66,7 +60,7 @@ CREATE OR REPLACE PROCEDURE update_content_by_id(
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM public.contents WHERE id = p_id) THEN
+    IF EXISTS (SELECT 1 FROM public.contents WHERE contents.content_id = p_id) THEN
         UPDATE public.contents
         SET
             title = p_title,
@@ -78,7 +72,7 @@ BEGIN
             episode_number = p_episode_number,
             series_id = p_series_id,
             updated_at = CURRENT_TIMESTAMP
-        WHERE id = p_id;
+        WHERE contents.content_id = p_id;
         RAISE NOTICE 'Content with ID % successfully updated.', p_id;
     ELSE
         RAISE EXCEPTION 'Content with ID % does not exist.', p_id;
@@ -138,7 +132,7 @@ BEGIN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id_in;
     END IF;
 
-    SELECT EXISTS (SELECT 1 FROM public.contents WHERE id = content_id_in) INTO content_exists;
+    SELECT EXISTS (SELECT 1 FROM public.contents WHERE content_id = content_id_in) INTO content_exists;
 
     IF NOT content_exists THEN
         RAISE EXCEPTION 'Content with ID % not found', content_id_in;
@@ -275,8 +269,8 @@ AS $$
 DECLARE
     new_referral RECORD;
 BEGIN
-    INSERT INTO public.referral (id, host_id, invited_id)
-    VALUES (nextval('referral_id_seq'), host_id_out, invited_id_out)
+    INSERT INTO public.referrals (id, host_id, invited_id)
+    VALUES (nextval('referrals_seq'), host_id_out, invited_id_out)
     RETURNING id, host_id, invited_id INTO new_referral;
 
     RAISE NOTICE 'Referral saved successfully with ID: %, Host ID: %, Invited ID: %',
@@ -303,7 +297,7 @@ $$
 BEGIN
     RETURN QUERY
         SELECT id, host_id, invited_id
-        FROM public.referral
+        FROM public.referrals
         WHERE invited_id = invited_id_data;
 
     IF NOT FOUND THEN
@@ -323,7 +317,7 @@ $$
 BEGIN
     SELECT r.resolution_id, r.name
     INTO resolution_id_out, name_out
-    FROM public.resolution r
+    FROM public.resolutions r
     WHERE r.resolution_id = resolution_id_param;
 
     IF NOT FOUND THEN
@@ -348,7 +342,7 @@ BEGIN
     END IF;
 
     INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-    VALUES (uuid_generate_v4(), start_date, end_date, profile_id, 0.0);
+    VALUES (gen_random_uuid(), start_date, end_date, profile_id, 0.0);
 END;
 $$;
 ----------------------
@@ -370,7 +364,7 @@ BEGIN
         RAISE EXCEPTION 'Profile with ID % not found', profile_id;
     END IF;
 
-    SELECT price INTO price_amount FROM public.price WHERE id = price_id;
+    SELECT price INTO price_amount FROM public.prices WHERE id = price_id;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Price not found for the given price_id: %', price_id;
     END IF;
@@ -380,7 +374,7 @@ BEGIN
     END IF;
 
     INSERT INTO public.subscriptions (id, start_date, end_date, profile_id, price_id)
-    VALUES (uuid_generate_v4(), start_date_insert, end_date_insert, profile_id, price_id);
+    VALUES (gen_random_uuid(), start_date_insert, end_date_insert, profile_id, price_id);
 
     subscription_cost := price_amount;
 
@@ -498,8 +492,8 @@ BEGIN
         RAISE EXCEPTION 'Referral link had been used';
     END IF;
 
-    INSERT INTO public.referral (id, host_id, invited_id)
-    VALUES (nextval('public.referral_seq'), host_user_id, invited_user_id);
+    INSERT INTO public.referrals (id, host_id, invited_id)
+    VALUES (nextval('public.referrals_seq'), host_user_id, invited_user_id);
 
     UPDATE public.users
     SET has_used_referral_link = TRUE
@@ -557,10 +551,9 @@ BEGIN
         FOREACH genre IN ARRAY genres
             LOOP
                 genre := genre::JSONB;
-                INSERT INTO public.preferences_genres (preferences_id, genres, genres_id)
+                INSERT INTO public.preferences_genres (preferences_id, genres_id)
                 VALUES (
                            preference_id,
-                           genre->>'name',
                            (genre->>'id')::bigint
                        );
             END LOOP;
@@ -583,7 +576,7 @@ BEGIN
     IF EXISTS (SELECT 1 FROM users WHERE email = email_in) THEN
         RAISE EXCEPTION 'Email is already taken';
     ELSE
-        new_user_id := uuid_generate_v4();
+        new_user_id := gen_random_uuid();
         INSERT INTO public.users (id, email, password, token, is_banned, has_used_referral_link)
         VALUES (new_user_id, email_in, password_in, token_in, false, false);
         INSERT INTO warnings (user_id, login_faults)

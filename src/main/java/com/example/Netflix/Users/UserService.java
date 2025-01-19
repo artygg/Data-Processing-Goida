@@ -68,6 +68,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void deleteById(UUID id) {
+        userRepository.deleteById(id);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
     public boolean isBanned(User user) {
         return user.isBanned();
     }
