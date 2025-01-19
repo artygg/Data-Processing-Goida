@@ -19,13 +19,13 @@ public class User {
     private UUID id;
 
     @NotBlank(message = "Email is required")
-    @Pattern(regexp = ".*@.*mail\\.com$", message = "Invalid format of an email address")
+    @Pattern(regexp = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$", message = "Invalid email format")
     private String email;
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
+            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&_-])[A-Za-z\\d@$!%*?&_-]+$",
             message = "Password must contain at least one uppercase letter, one lowercase letter and one special character"
     )
     private String password;
