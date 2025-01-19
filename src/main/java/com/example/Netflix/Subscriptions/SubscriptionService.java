@@ -35,6 +35,7 @@ public class SubscriptionService {
 
     public Optional<Subscription> getSubscriptionById(UUID id) {
         return subscriptionRepository.findById(id);
+
     }
 
     public void applyDiscountForInvitation(UUID inviterProfileId, UUID inviteeProfileId) {

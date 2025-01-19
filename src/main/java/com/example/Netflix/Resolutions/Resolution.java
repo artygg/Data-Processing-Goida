@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
+@Table(name = "resolutions")
 @Entity
 public class Resolution {
     @Id

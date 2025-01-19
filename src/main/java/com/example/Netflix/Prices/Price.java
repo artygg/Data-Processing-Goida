@@ -5,12 +5,14 @@ import com.example.Netflix.Subscriptions.Subscription;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
 @Entity
+@Table(name = "prices")
 public class Price {
     @Id
     private Integer id;

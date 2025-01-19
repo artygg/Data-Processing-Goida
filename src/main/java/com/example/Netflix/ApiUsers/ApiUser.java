@@ -3,6 +3,7 @@ package com.example.Netflix.ApiUsers;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+@Table(name = "api_users")
 @Entity
 public class ApiUser {
     @Id

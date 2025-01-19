@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
+@Table(name = "referrals")
 @Entity
 public class Referral {
     @Id
