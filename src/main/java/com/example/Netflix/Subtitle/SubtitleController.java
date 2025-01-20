@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/subtitles")
+@RequestMapping("/subtitles")
 public class SubtitleController {
     private final SubtitleService subtitleService;
 

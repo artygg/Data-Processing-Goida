@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/qualityRanges")
+@RequestMapping("/qualityRanges")
 public class QualityRangeController {
     private final QualityRangeService qualityRangeService;
 

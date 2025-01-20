@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/watchHistory")
+@RequestMapping("/watchHistory")
 public class WatchHistoryController extends BaseController<WatchHistory, Long> {
 
     @Autowired
