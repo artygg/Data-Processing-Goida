@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
@@ -16,13 +17,11 @@ import java.util.List;
 public class Price {
     @Id
     private Integer id;
-    @NotBlank(message = "Price is required")
+    @NotNull(message = "Price is required")
     private double price;
     @OneToMany
-    @NotBlank(message = "Resolutions are required")
     private List<Resolution> resolutions;
     @OneToMany
-    @NotBlank(message = "Subscriptions are required")
     private List<Subscription> subscriptions;
 
     public Price() {
