@@ -511,7 +511,7 @@ CREATE OR REPLACE PROCEDURE update_profile_preferences(
     classifications TEXT[],
     genres TEXT[],
     interested_in_films BOOLEAN,
-    interested_in_series BOOLEAN,
+    interested_in_series_in BOOLEAN,
     interested_in_films_with_min_age BOOLEAN
 )
     LANGUAGE plpgsql
@@ -536,20 +536,14 @@ BEGIN
     ELSE
         converted_classifications := NULL;
     END IF;
-
-    UPDATE public.preferences
-    SET
-        is_interested_in_films = interested_in_films,
-        is_interested_in_films_with_minimum_age = interested_in_films_with_min_age,
-        is_interested_in_series = interested_in_series
-    WHERE profile_id = profile_id_field;
+    preference_id = nextval('public.preferences_id_seq');
+    INSERT INTO public.preferences (id, is_interested_in_films, is_interested_in_films_with_minimum_age, is_interested_in_series, profile_id)
+    VALUES (preference_id, interested_in_films, interested_in_films_with_min_age, interested_in_series_in, profile_id_field);
 
     SELECT id
     INTO preference_id
     FROM public.preferences
     WHERE profile_id = profile_id_field;
-
-    DELETE FROM public.preferences_genres WHERE preferences_id = preference_id;
 
     IF genres IS NOT NULL THEN
         FOREACH genre IN ARRAY genres
