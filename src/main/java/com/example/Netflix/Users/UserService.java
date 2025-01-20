@@ -83,19 +83,4 @@ public class UserService {
     public String generateToken() {
         return UUID.randomUUID().toString();
     }
-
-    @Scheduled(fixedRate = 60000)
-    public void unbanUser() {
-        System.out.println("Checking unban");
-        List<User> bannedUsers = userRepository.findAll().stream().filter(user -> user.isBanned() && user.getWarning().getBanEndDate() != null).toList();
-
-        for (User user : bannedUsers) {
-            if (LocalDateTime.now().isAfter(user.getWarning().getBanEndDate())) {
-                user.setBanned(false);
-                user.getWarning().setBanEndDate(null);
-                user.getWarning().setLoginFaults(0);
-                userRepository.save(user);
-            }
-        }
-    }
 }
