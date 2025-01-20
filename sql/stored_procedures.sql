@@ -188,58 +188,69 @@ $$;
 
 ----------------------
 CREATE OR REPLACE PROCEDURE create_profile(
-    user_id_field UUID,
-    new_profile_name TEXT,
-    new_profile_photo TEXT,
-    new_age DATE,
-    new_language TEXT
+    IN user_id_field UUID,
+    IN new_profile_name TEXT,
+    IN new_profile_photo TEXT,
+    IN new_age DATE,
+    IN new_language TEXT
 )
     LANGUAGE plpgsql
 AS $$
 DECLARE
-    existing_profile RECORD;
     valid_language BOOLEAN;
-    is_child BOOLEAN;
+    is_child_declaration BOOLEAN;
     calculated_age INT;
+    calculated_birth_date DATE;
 BEGIN
-    SELECT * INTO existing_profile
-    FROM public.profiles
-    WHERE user_id = user_id_field;
-
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'Profile with user ID % not found', user_id_field;
+    -- Check if the profile already exists
+    IF NOT EXISTS (
+        SELECT 1 FROM public.profiles WHERE user_id = user_id_field
+    ) THEN
+        -- Create a new profile
+        INSERT INTO public.profiles (id, user_id, profile_name, profile_photo, age, is_child, language)
+        VALUES (
+                   gen_random_uuid(),
+                   user_id_field,
+                   COALESCE(new_profile_name, 'Unknown'),
+                   new_profile_photo,
+                   NULL, -- Default age
+                   NULL, -- Default is_child
+                   CASE
+                       WHEN new_language IS NOT NULL AND UPPER(new_language) IN ('ENGLISH', 'RUSSIAN', 'ARABIC', 'FRENCH', 'JAPANESE') THEN UPPER(new_language)
+                       ELSE NULL
+                       END
+               );
+        RAISE NOTICE 'New profile created for User ID: %', user_id_field;
     END IF;
 
-    IF new_age IS NULL THEN
-        UPDATE public.profiles
-        SET age = null
-        WHERE user_id = user_id_field;
-    ELSE
+    -- If age is provided, calculate and update age and is_child
+    IF new_age IS NOT NULL THEN
         calculated_age := DATE_PART('year', AGE(new_age));
-        IF calculated_age < 18 AND calculated_age >= 0 THEN
-            is_child := TRUE;
-        ELSE
-            is_child := FALSE;
-        END IF;
+        is_child_declaration := calculated_age < 18 AND calculated_age >= 0;
+        calculated_birth_date := CURRENT_DATE - (calculated_age * INTERVAL '1 year');
 
         UPDATE public.profiles
-        SET age = calculated_age,
-            is_child = is_child
+        SET
+            age = calculated_birth_date,
+            is_child = is_child_declaration
         WHERE user_id = user_id_field;
     END IF;
 
+    -- Update profile name if provided
     IF new_profile_name IS NOT NULL AND new_profile_name <> '' THEN
         UPDATE public.profiles
         SET profile_name = new_profile_name
         WHERE user_id = user_id_field;
     END IF;
 
+    -- Update profile photo if provided
     IF new_profile_photo IS NOT NULL AND new_profile_photo <> '' THEN
         UPDATE public.profiles
         SET profile_photo = new_profile_photo
         WHERE user_id = user_id_field;
     END IF;
 
+    -- Validate and update language
     valid_language := EXISTS (
         SELECT 1
         FROM unnest(ARRAY['ENGLISH', 'RUSSIAN', 'ARABIC', 'FRENCH', 'JAPANESE']) AS lang
@@ -259,6 +270,7 @@ BEGIN
     RAISE NOTICE 'Profile updated successfully for User ID: %', user_id_field;
 END;
 $$;
+
 ----------------------
 CREATE OR REPLACE PROCEDURE save_referral(
     host_id_out UUID,

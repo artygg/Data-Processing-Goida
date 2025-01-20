@@ -55,7 +55,10 @@ public class SecurityConfig {
                                 "/profiles/**",
                                 "/preferences/**",
                                 "/resolutions/**",
-                                "/prices"
+                                "/prices",
+                                "/api-user/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

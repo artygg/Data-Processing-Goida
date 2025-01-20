@@ -1,5 +1,6 @@
 package com.example.Netflix.ApiUsers;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -8,12 +9,19 @@ import jakarta.validation.constraints.NotBlank;
 public class ApiUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Schema(description = "Unique identifier of the user")
     private Long id;
+
     @Column(unique = true)
     @NotBlank(message = "Login is required")
+    @Schema(description = "Login of the user", example = "john_doe")
     private String login;
+
     @NotBlank(message = "Password is required")
+    @Schema(description = "Password of the user")
     private String password;
+
+    @Schema(description = "Token assigned to the user after login")
     private String token;
 
     public ApiUser() {
