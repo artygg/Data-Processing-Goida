@@ -9,20 +9,20 @@ import jakarta.persistence.*;
 public class WatchLater
 {
     @Id
-    @Column(name = "profile_id") // Explicit mapping for profile_id
+    @Column(name = "profile_id")
     private Long profileId;
 
     @Id
-    @Column(name = "content_id") // Explicit mapping for content_id
+    @Column(name = "content_id")
     private Long contentId;
 
     @ManyToOne
-    @JoinColumn(name = "content_id", insertable = false, updatable = false) // Prevent duplicate mapping
+    @JoinColumn(name = "content_id", insertable = false, updatable = false)
     private Content content;
 
 
-    public WatchLater()
-    {
+    public WatchLater() {
+
     }
 
     public Long getProfileId()

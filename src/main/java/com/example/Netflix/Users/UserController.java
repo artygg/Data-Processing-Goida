@@ -2,9 +2,7 @@ package com.example.Netflix.Users;
 
 import com.example.Netflix.JSON.ResponseMessage;
 import com.example.Netflix.JWT.JwtTokenFactory;
-import com.example.Netflix.Referals.Referral;
 import com.example.Netflix.Referals.ReferralService;
-import com.example.Netflix.Warnings.Warning;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,7 +42,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseMessage("User was registered successfully"));
     }
 
-    @PostMapping(value = "/login",
+    @GetMapping(value = "/login",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> login(@RequestBody @Valid User userRequestBody) {
         String email = userRequestBody.getEmail();
