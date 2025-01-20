@@ -8,11 +8,11 @@ import jakarta.persistence.*;
 @Table(name = "quality_ranges")
 public class QualityRange {
     @Id
-    @Column(name = "content_id") // Use explicit column name
+    @Column(name = "content_id")
     private Long contentId;
 
     @Id
-    @Column(name = "resolution_id") // Use explicit column name
+    @Column(name = "resolution_id")
     private Long resolutionId;
 
     @Column(name = "resolution_name")
